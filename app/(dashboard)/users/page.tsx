@@ -1,5 +1,13 @@
 import React from "react";
 import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
+
+// Server action called on form submit.
+// Creates a new user, then redirects.
+async function createUser(formData: FormData) {
+  "use server";
+  redirect("/users?submitted=1");
+}
 
 export default async function Page() {
   // Fetch all users from the database
@@ -13,6 +21,10 @@ export default async function Page() {
       {users.map((u) => (
         <div key={u.id}>{u.email}</div>
       ))}
+      <form action={createUser}>
+        <input type="email" name="email" placeholder="Email" />
+        <button type="submit">Add user</button>
+      </form>
     </div>
   );
 }
