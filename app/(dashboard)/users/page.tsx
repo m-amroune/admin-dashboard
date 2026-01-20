@@ -6,14 +6,21 @@ import { redirect } from "next/navigation";
 // Creates a new user, then redirects.
 async function createUser(formData: FormData) {
   "use server";
-  redirect("/users?submitted=1");
+  const email = String(formData.get("email") || "").trim();
+  if (!email) redirect("/users?error=missing_email");
+
+  await prisma.user.create({ data: { email } });
+  redirect("/users?created=1");
 }
+
 // Server action to delete a user by id
 async function deleteUser(formData: FormData) {
   "use server";
   const id = Number(formData.get("id"));
   await prisma.user.delete({ where: { id } });
+  redirect("/users?deleted=1");
 }
+
 // Server action to switch a user's role.
 // If the user is admin, set role to user
 async function toggleRole(formData: FormData) {
@@ -27,15 +34,29 @@ async function toggleRole(formData: FormData) {
     where: { id },
     data: { role: nextRole },
   });
+
+  redirect("/users?updated=1");
 }
 
-export default async function Page() {
+type SearchParams = Record<string, string | undefined>;
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: SearchParams | Promise<SearchParams>;
+}) {
   // Fetch all users from the database
-  const users = await prisma.user.findMany();
+  const params = await Promise.resolve(searchParams ?? {});
+  const isCreated = params["created"] === "1";
+
+  const users = await prisma.user.findMany({
+    orderBy: { createdAt: "desc" },
+  });
 
   return (
     <div>
       <h1>Users</h1>
+      {isCreated && <p>User created successfully</p>}
 
       {/* Render a list of user emails */}
       {users.map((u) => (
@@ -52,6 +73,7 @@ export default async function Page() {
           </form>
         </div>
       ))}
+
       <form action={createUser}>
         <input type="email" name="email" placeholder="Email" />
         <button type="submit">Add user</button>
