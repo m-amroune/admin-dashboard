@@ -17,6 +17,12 @@ model User {
   createdAt DateTime @default(now())
 }
 
+model Order {
+  id        Int      @id @default(autoincrement())
+  email     String
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+}
 
 
 

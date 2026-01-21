@@ -59,16 +59,16 @@ export default async function Page({
       {isCreated && <p>User created successfully</p>}
 
       {/* Render a list of user emails */}
-      {users.map((u) => (
-        <div key={u.id}>
-          {u.email} — {u.role}
+      {users.map((user) => (
+        <div key={user.id}>
+          {user.email} — {user.role}
           <form action={toggleRole}>
-            <input type="hidden" name="id" value={u.id} />
-            <input type="hidden" name="role" value={u.role} />
+            <input type="hidden" name="id" value={user.id} />
+            <input type="hidden" name="role" value={user.role} />
             <button type="submit">Toggle role</button>
           </form>
           <form action={deleteUser}>
-            <input type="hidden" name="id" value={u.id} />
+            <input type="hidden" name="id" value={user.id} />
             <button type="submit">Delete</button>
           </form>
         </div>
