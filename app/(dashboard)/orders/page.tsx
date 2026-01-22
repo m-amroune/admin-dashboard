@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
 
 // Server action to move an order to the next status
 async function nextStatus(formData: FormData) {
@@ -29,7 +30,9 @@ export default async function Page() {
       {/* Render the list of orders */}
       {orders.map((order) => (
         <div key={order.id}>
-          {order.email} — {order.status}
+          {/* Link to order detail page */}
+          <Link href={`/orders/${order.id}`}>{order.email}</Link> —
+          {order.status}
           {/* Button to change the order status */}
           <form action={nextStatus}>
             <input type="hidden" name="id" value={order.id} />

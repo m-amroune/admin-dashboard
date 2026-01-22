@@ -9,7 +9,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
         <Link href="/users">Users</Link>
         <Link href="/orders">Orders</Link>
       </aside>
-      <main>{children}</main>
+      <main style={{ flex: 1, padding: 12 }}>{children}</main>
     </div>
   );
 };
