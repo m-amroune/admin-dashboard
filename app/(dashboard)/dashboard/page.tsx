@@ -13,7 +13,6 @@ async function logout() {
   redirect("/login");
 }
 
-// Dashboard page (read-only)
 // Displays global statistics and provides a logout action
 const page = async () => {
   // Total users count
