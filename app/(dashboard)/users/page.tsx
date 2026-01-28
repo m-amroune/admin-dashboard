@@ -57,6 +57,9 @@ export default async function Page({
       <h1>Users</h1>
       {isCreated && <p>User created successfully</p>}
 
+      {/* Empty state */}
+      {users.length === 0 && <p>No users found.</p>}
+
       {/* Render a list of user emails */}
       {users.map((user) => (
         <div key={user.id}>

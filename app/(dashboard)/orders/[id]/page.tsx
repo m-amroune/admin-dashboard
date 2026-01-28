@@ -8,11 +8,11 @@ export default async function Page({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  // Resolve dynamic route params
+  // Resolve dynamic route params (Next.js 16)
   const { id } = await params;
   const orderId = Number(id);
 
-  // Invalid ID (not a number)
+  // Invalid ID
   if (!Number.isInteger(orderId)) {
     notFound();
   }

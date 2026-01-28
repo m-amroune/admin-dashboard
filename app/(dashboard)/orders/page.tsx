@@ -27,6 +27,9 @@ export default async function Page() {
     <div>
       <h1>Orders</h1>
 
+      {/* Empty state */}
+      {orders.length === 0 && <p>No orders found.</p>}
+
       {/* Render the list of orders */}
       {orders.map((order) => (
         <div key={order.id}>
