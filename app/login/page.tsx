@@ -24,12 +24,13 @@ async function login() {
 
 export default function Page() {
   return (
-    <main style={{ padding: 24 }}>
-      <h1>Login</h1>
-
-      <form action={login}>
-        <button type="submit">Login</button>
-      </form>
-    </main>
+    <div className="min-h-screen flex items-center justify-center">
+      <main className="p-6">
+        <h1 className="text-red-500 text-3xl font-bold">Admin Dashboard</h1>
+        <form action={login}>
+          <button type="submit">Login</button>
+        </form>
+      </main>
+    </div>
   );
 }
