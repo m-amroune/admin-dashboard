@@ -53,32 +53,72 @@ export default async function Page({
   });
 
   return (
-    <div>
-      <h1>Users</h1>
-      {isCreated && <p>User created successfully</p>}
+    <div className="max-w-3xl">
+      <h1 className="mb-6 text-2xl font-semibold">Users</h1>
+
+      {isCreated && (
+        <p className="mb-4 text-sm text-green-600">User created successfully</p>
+      )}
 
       {/* Empty state */}
-      {users.length === 0 && <p>No users found.</p>}
+      {users.length === 0 && (
+        <p className="mb-4 text-sm text-gray-500">No users found.</p>
+      )}
 
       {/* Render a list of user emails */}
-      {users.map((user) => (
-        <div key={user.id}>
-          {user.email} — {user.role}
-          <form action={toggleRole}>
-            <input type="hidden" name="id" value={user.id} />
-            <input type="hidden" name="role" value={user.role} />
-            <button type="submit">Toggle role</button>
-          </form>
-          <form action={deleteUser}>
-            <input type="hidden" name="id" value={user.id} />
-            <button type="submit">Delete</button>
-          </form>
-        </div>
-      ))}
+      <div className="space-y-2 max-w-md">
+        {users.map((user) => (
+          <div
+            key={user.id}
+            className="flex items-center justify-between rounded-md border p-3 text-sm"
+          >
+            <div>
+              {user.email} — <span className="text-gray-500">{user.role}</span>
+            </div>
 
-      <form action={createUser}>
-        <input type="email" name="email" placeholder="Email" />
-        <button type="submit">Add user</button>
+            <div className="flex gap-2">
+              <form action={toggleRole}>
+                <input type="hidden" name="id" value={user.id} />
+                <input type="hidden" name="role" value={user.role} />
+                <button
+                  type="submit"
+                  className="rounded-md border px-3 py-1 hover:bg-gray-100 cursor-pointer"
+                >
+                  Toggle role
+                </button>
+              </form>
+
+              <form action={deleteUser}>
+                <input type="hidden" name="id" value={user.id} />
+                <button
+                  type="submit"
+                  className="rounded-md border px-3 py-1 text-red-600 hover:bg-red-50 cursor-pointer"
+                >
+                  Delete
+                </button>
+              </form>
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* Create user */}
+      <form
+        action={createUser}
+        className="mt-6 flex max-w-md items-center justify-center gap-4"
+      >
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          className="w-56 rounded-md border px-3 py-2 text-sm"
+        />
+
+        <button
+          type="submit"
+          className="cursor-pointer rounded-md border px-6 py-2 text-sm hover:bg-gray-100"
+        >
+          Add user
+        </button>
       </form>
     </div>
   );

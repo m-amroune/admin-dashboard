@@ -24,13 +24,19 @@ async function login() {
 
 export default function Page() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <main className="p-6">
-        <h1 className="text-red-500 text-3xl font-bold">Admin Dashboard</h1>
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="w-full max-w-sm rounded-lg border p-6 text-center">
+        <h1 className="mb-4 text-lg font-semibold">Admin Dashboard</h1>
+
         <form action={login}>
-          <button type="submit">Login</button>
+          <button
+            type="submit"
+            className="w-full cursor-pointer rounded-md border px-4 py-2 text-sm font-medium hover:bg-gray-100"
+          >
+            Login
+          </button>
         </form>
-      </main>
+      </div>
     </div>
   );
 }

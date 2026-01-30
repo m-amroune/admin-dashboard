@@ -3,13 +3,31 @@ import Link from "next/link";
 
 const layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      <aside style={{ width: 200, borderRight: "1px solid #ddd", padding: 12 }}>
-        <Link href="/dashboard">Dashboard</Link>
-        <Link href="/users">Users</Link>
-        <Link href="/orders">Orders</Link>
+    <div className="flex min-h-screen">
+      <aside className="w-52 border-r p-4">
+        <nav className="flex flex-col items-center gap-2 text-sm">
+          <Link
+            href="/dashboard"
+            className="rounded-md px-6 py-3 text-lg hover:bg-gray-100"
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/users"
+            className="rounded-md px-6 py-3 text-lg hover:bg-gray-100"
+          >
+            Users
+          </Link>
+          <Link
+            href="/orders"
+            className="rounded-md px-6 py-3 text-lg hover:bg-gray-100"
+          >
+            Orders
+          </Link>
+        </nav>
       </aside>
-      <main style={{ flex: 1, padding: 12 }}>{children}</main>
+
+      <main className="flex-1 p-6">{children}</main>
     </div>
   );
 };

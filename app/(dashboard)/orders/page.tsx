@@ -24,26 +24,46 @@ export default async function Page() {
   });
 
   return (
-    <div>
-      <h1>Orders</h1>
+    <div className="max-w-md">
+      <h1 className="mb-6 text-2xl font-semibold">Orders</h1>
 
       {/* Empty state */}
-      {orders.length === 0 && <p>No orders found.</p>}
+      {orders.length === 0 && (
+        <p className="mb-4 text-sm text-gray-500">No orders found.</p>
+      )}
 
       {/* Render the list of orders */}
-      {orders.map((order) => (
-        <div key={order.id}>
-          {/* Link to order detail page */}
-          <Link href={`/orders/${order.id}`}>{order.email}</Link> —
-          {order.status}
-          {/* Button to change the order status */}
-          <form action={nextStatus}>
-            <input type="hidden" name="id" value={order.id} />
-            <input type="hidden" name="status" value={order.status} />
-            <button type="submit">Next status</button>
-          </form>
-        </div>
-      ))}
+      <div className="space-y-2">
+        {orders.map((order) => (
+          <div
+            key={order.id}
+            className="flex items-center justify-between rounded-md border p-3 text-sm"
+          >
+            <div>
+              {/* Link to order detail page */}
+              <Link
+                href={`/orders/${order.id}`}
+                className="font-medium hover:underline"
+              >
+                {order.email}
+              </Link>{" "}
+              — <span className="text-gray-500">{order.status}</span>
+            </div>
+
+            {/* Button to change the order status */}
+            <form action={nextStatus}>
+              <input type="hidden" name="id" value={order.id} />
+              <input type="hidden" name="status" value={order.status} />
+              <button
+                type="submit"
+                className="cursor-pointer rounded-md border px-3 py-1 hover:bg-gray-100"
+              >
+                Next status
+              </button>
+            </form>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

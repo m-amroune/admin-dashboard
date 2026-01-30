@@ -29,11 +29,19 @@ const page = async () => {
 
   return (
     <div>
-      <h1 className="text-red-500 text-3xl font-bold">Dashboard</h1>
+      <h1 className="mb-6 text-2xl font-semibold">Dashboard</h1>
 
       {/* Global statistics */}
-      <p>Users: {usersCount}</p>
-      <p>Orders: {ordersCount}</p>
+      <div className="grid grid-cols-2 gap-4 mb-6 max-w-2xl">
+        <div className="rounded-lg border p-4">
+          <p className="text-sm text-gray-500">Users</p>
+          <p className="text-2xl font-semibold">{usersCount}</p>
+        </div>
+        <div className="rounded-lg border p-4">
+          <p className="text-sm text-gray-500">Orders</p>
+          <p className="text-2xl font-semibold">{ordersCount}</p>
+        </div>
+      </div>
 
       {/* Orders breakdown by status */}
       <ul>
@@ -46,7 +54,12 @@ const page = async () => {
 
       {/* Logout action */}
       <form action={logout}>
-        <button type="submit">Logout</button>
+        <button
+          type="submit"
+          className="mt-4 rounded-md border px-4 py-2 text-sm font-medium hover:bg-gray-100 cursor-pointer"
+        >
+          Logout
+        </button>
       </form>
     </div>
   );
