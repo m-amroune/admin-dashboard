@@ -54,12 +54,6 @@ export default async function Page() {
             <form action={nextStatus}>
               <input type="hidden" name="id" value={order.id} />
               <input type="hidden" name="status" value={order.status} />
-              <button
-                type="submit"
-                className="cursor-pointer rounded-md border px-3 py-1 hover:bg-gray-100"
-              >
-                Next status
-              </button>
             </form>
           </div>
         ))}

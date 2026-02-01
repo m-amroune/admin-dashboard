@@ -84,7 +84,7 @@ export default async function Page({
                   type="submit"
                   className="rounded-md border px-3 py-1 hover:bg-gray-100 cursor-pointer"
                 >
-                  Toggle role
+                  {user.role === "admin" ? "Remove admin" : "Make admin"}
                 </button>
               </form>
 
