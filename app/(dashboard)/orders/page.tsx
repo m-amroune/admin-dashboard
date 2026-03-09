@@ -1,18 +1,21 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
-// Server action to move an order to the next status
-async function nextStatus(formData: FormData) {
+// Server action to update the status of an order.
+// Receives the order id and the selected status from the form.
+async function updateOrderStatus(formData: FormData) {
   "use server";
+
   const id = Number(formData.get("id"));
   const status = String(formData.get("status"));
 
-  const next =
-    status === "pending" ? "paid" : status === "paid" ? "shipped" : "pending";
+  if (!["pending", "paid", "shipped"].includes(status)) {
+    return;
+  }
 
   await prisma.order.update({
     where: { id },
-    data: { status: next },
+    data: { status },
   });
 }
 
@@ -50,10 +53,25 @@ export default async function Page() {
               — <span className="text-gray-500">{order.status}</span>
             </div>
 
-            {/* Button to change the order status */}
-            <form action={nextStatus}>
+            <form action={updateOrderStatus} className="flex gap-2">
               <input type="hidden" name="id" value={order.id} />
-              <input type="hidden" name="status" value={order.status} />
+
+              <select
+                name="status"
+                defaultValue={order.status}
+                className="rounded-md border px-2 py-1 text-sm"
+              >
+                <option value="pending">Pending</option>
+                <option value="paid">Paid</option>
+                <option value="shipped">Shipped</option>
+              </select>
+
+              <button
+                type="submit"
+                className="rounded-md border px-3 py-1 hover:bg-gray-100 cursor-pointer"
+              >
+                Update
+              </button>
             </form>
           </div>
         ))}

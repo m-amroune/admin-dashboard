@@ -54,7 +54,6 @@ The dashboard includes the following modules:
 - Shared dashboard layout with sidebar navigation
 - Users CRUD operations
 - Orders listing and status display
-- Simple and consistent UI
 
 ---
 
