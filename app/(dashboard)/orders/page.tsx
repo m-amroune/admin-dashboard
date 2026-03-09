@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+export const dynamic = "force-dynamic";
 
 // Server action to update the status of an order.
 // Receives the order id and the selected status from the form.

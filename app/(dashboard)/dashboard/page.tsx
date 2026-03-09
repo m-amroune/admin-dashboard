@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+export const dynamic = "force-dynamic";
 
 // Server Action: log out the user
 // Deletes the session cookie and redirects to the login page
