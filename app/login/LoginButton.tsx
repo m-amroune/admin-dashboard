@@ -9,7 +9,7 @@ export function LoginButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full cursor-pointer rounded-md border px-4 py-2 text-sm font-medium hover:bg-gray-100 disabled:opacity-50"
+      className="w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
     >
       {pending ? "Loading..." : "Login"}
     </button>
