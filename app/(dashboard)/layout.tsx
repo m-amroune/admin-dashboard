@@ -1,7 +1,13 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import React from "react";
 import Link from "next/link";
 
-const layout = ({ children }: { children: React.ReactNode }) => {
+const layout = async ({ children }: { children: React.ReactNode }) => {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("dh_session");
+  if (!session) redirect("/login");
+
   return (
     <div className="flex min-h-screen">
       <aside className="w-52 border-r p-4">
