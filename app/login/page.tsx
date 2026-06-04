@@ -27,8 +27,10 @@ async function login() {
 export default function Page() {
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-8 shadow-sm text-center text-base">
-        <h1 className="mb-6 text-xl font-semibold">Admin Dashboard</h1>
+      <div className="fade-in-up me diw-full max-w-sm rounded-lg border border-gray-200 bg-white p-8 shadow-sm text-center text-base space-y-6">
+        <h1 className="mb-6 text-2xl font-semibold tracking-tight">
+          Admin Dashboard
+        </h1>
 
         <form action={login}>
           <LoginButton />

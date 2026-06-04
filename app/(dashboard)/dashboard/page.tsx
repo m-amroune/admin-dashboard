@@ -29,7 +29,7 @@ const page = async () => {
   });
 
   return (
-    <div>
+    <div className="fade-in-up">
       <h1 className="mb-6 text-2xl font-semibold">Dashboard</h1>
 
       {/* Global statistics */}
