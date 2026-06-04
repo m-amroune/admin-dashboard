@@ -30,15 +30,17 @@ const page = async () => {
 
   return (
     <div className="fade-in-up">
-      <h1 className="mb-6 text-2xl font-semibold">Dashboard</h1>
+      <h1 className="mb-8 text-3xl font-bold tracking-tight text-gray-800">
+        Dashboard
+      </h1>
 
       {/* Global statistics */}
-      <div className="grid grid-cols-2 gap-4 mb-6 max-w-2xl">
-        <div className="rounded-lg border p-4">
+      <div className="grid grid-cols-2 gap-6 mb-10 max-w-2xl">
+        <div className="rounded-xl border border-gray-300 bg-white p-5 shadow-lg transition-all">
           <p className="text-sm text-gray-500">Users</p>
           <p className="text-2xl font-semibold">{usersCount}</p>
         </div>
-        <div className="rounded-lg border p-4">
+        <div className="rounded-xl border border-gray-300 bg-white p-5 shadow-lg transition-all">
           <p className="text-sm text-gray-500">Orders</p>
           <p className="text-2xl font-semibold">{ordersCount}</p>
         </div>
@@ -57,7 +59,7 @@ const page = async () => {
       <form action={logout}>
         <button
           type="submit"
-          className="mt-4 rounded-md border px-4 py-2 text-sm font-medium hover:bg-gray-100 cursor-pointer"
+          className="mt-5 rounded-md border px-6 py-2.5 text-base font-medium hover:bg-gray-100 cursor-pointer transition"
         >
           Logout
         </button>
