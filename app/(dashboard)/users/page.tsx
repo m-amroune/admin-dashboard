@@ -66,14 +66,14 @@ export default async function Page({
       )}
 
       {/* Render a list of user emails */}
-      <div className="space-y-2 max-w-md">
+      <div className="space-y-2 max-w-lg">
         {users.map((user) => (
           <div
             key={user.id}
-            className="flex items-center justify-between rounded-md border p-3 text-sm"
+            className="flex items-center justify-between rounded-md border p-3 text-sm bg-gray-50 shadow-sm"
           >
             <div>
-              {user.email} — <span className="text-gray-500">{user.role}</span>
+              {user.email} - <span className="text-gray-500">{user.role}</span>
             </div>
 
             <div className="flex gap-2">
@@ -82,7 +82,7 @@ export default async function Page({
                 <input type="hidden" name="role" value={user.role} />
                 <button
                   type="submit"
-                  className="rounded-md border px-3 py-1 hover:bg-gray-100 cursor-pointer"
+                  className="rounded-md border px-4 py-2 text-sm bg-white hover:bg-gray-100 transition min-w-36 text-center cursor-pointer"
                 >
                   {user.role === "admin" ? "Remove admin" : "Make admin"}
                 </button>
@@ -92,7 +92,7 @@ export default async function Page({
                 <input type="hidden" name="id" value={user.id} />
                 <button
                   type="submit"
-                  className="rounded-md border px-3 py-1 text-red-600 hover:bg-red-50 cursor-pointer"
+                  className="rounded-md border px-4 py-2 text-sm bg-white text-red-600 hover:bg-red-50 transition min-w-36 text-center cursor-pointer"
                 >
                   Delete
                 </button>
@@ -110,12 +110,12 @@ export default async function Page({
           type="email"
           name="email"
           placeholder="Email"
-          className="w-56 rounded-md border px-3 py-2 text-sm"
+          className="w-64 rounded-md border px-4 py-2 text-base"
         />
 
         <button
           type="submit"
-          className="cursor-pointer rounded-md border px-6 py-2 text-sm hover:bg-gray-100"
+          className="cursor-pointer rounded-md border px-5 py-2.5 text-base hover:bg-gray-100 transition"
         >
           Add user
         </button>
