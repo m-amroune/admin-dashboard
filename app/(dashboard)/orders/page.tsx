@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+
 export const dynamic = "force-dynamic";
 
 // Server action to update the status of an order.
@@ -18,6 +20,8 @@ async function updateOrderStatus(formData: FormData) {
     where: { id },
     data: { status },
   });
+
+  redirect("/orders");
 }
 
 // Orders page
@@ -41,7 +45,7 @@ export default async function Page() {
         {orders.map((order) => (
           <div
             key={order.id}
-            className="flex items-center justify-between rounded-md border p-3 text-sm"
+            className="flex items-center justify-between rounded-md border p-4 text-sm bg-gray-50 shadow-sm"
           >
             <div>
               {/* Link to order detail page */}
@@ -51,7 +55,7 @@ export default async function Page() {
               >
                 {order.email}
               </Link>{" "}
-              — <span className="text-gray-500">{order.status}</span>
+              --- <span className="text-gray-500">{order.status}</span>
             </div>
 
             <form action={updateOrderStatus} className="flex gap-2">
@@ -60,7 +64,7 @@ export default async function Page() {
               <select
                 name="status"
                 defaultValue={order.status}
-                className="rounded-md border px-2 py-1 text-sm"
+                className="rounded-md border px-3 py-2 text-sm bg-white"
               >
                 <option value="pending">Pending</option>
                 <option value="paid">Paid</option>
@@ -69,7 +73,7 @@ export default async function Page() {
 
               <button
                 type="submit"
-                className="rounded-md border px-3 py-1 hover:bg-gray-100 cursor-pointer"
+                className="rounded-md border px-4 py-2 text-sm bg-white hover:bg-gray-100 cursor-pointer min-w-28 text-center"
               >
                 Update
               </button>
