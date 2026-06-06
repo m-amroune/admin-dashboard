@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+export const dynamic = "force-dynamic";
 
 // Server action called on form submit.
 // Creates a new user, then redirects.
