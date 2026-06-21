@@ -16,8 +16,8 @@ async function login() {
   cookieStore.set("dh_session", "1", {
     path: "/",
     httpOnly: true,
-    sameSite: "strict",
-    secure: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
   });
 
   // Redirect after successful login
@@ -26,13 +26,13 @@ async function login() {
 
 export default function Page() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="fade-in-up me diw-full max-w-sm rounded-lg border border-gray-200 bg-white p-8 shadow-sm text-center text-base space-y-6">
-        <h1 className="mb-6 text-2xl font-semibold tracking-tight">
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-gray-100 via-gray-200 to-gray-300">
+      <div className="fade-in-up me w-full max-w-lg rounded-lg border border-gray-200 bg-white p-10 shadow-sm text-center text-lg ">
+        <h1 className=" text-3xl font-semibold tracking-tight">
           Admin Dashboard
         </h1>
-
-        <form action={login}>
+        <p className="text-base text-gray-500 mt-1.6">Sign in to continue</p>
+        <form className="mt-4 w-full" action={login}>
           <LoginButton />
         </form>
       </div>
