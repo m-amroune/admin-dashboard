@@ -45,26 +45,32 @@ export default async function Page() {
         {orders.map((order) => (
           <div
             key={order.id}
-            className="flex items-center justify-between rounded-md border p-4 text-sm bg-gray-50 shadow-sm"
+            className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 text-sm shadow-sm"
           >
-            <div>
+            <div className="flex flex-col gap-2">
               {/* Link to order detail page */}
               <Link
                 href={`/orders/${order.id}`}
-                className="font-medium hover:underline"
+                className="text-sm font-medium text-gray-800 hover:underline"
               >
                 {order.email}
-              </Link>{" "}
-              --- <span className="text-gray-500">{order.status}</span>
+              </Link>
+
+              <span className="w-fit rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium capitalize text-gray-600">
+                {order.status}
+              </span>
             </div>
 
-            <form action={updateOrderStatus} className="flex gap-2">
+            <form
+              action={updateOrderStatus}
+              className="flex items-center gap-3"
+            >
               <input type="hidden" name="id" value={order.id} />
 
               <select
                 name="status"
                 defaultValue={order.status}
-                className="rounded-md border px-3 py-2 text-sm bg-white"
+                className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700"
               >
                 <option value="pending">Pending</option>
                 <option value="paid">Paid</option>
@@ -73,7 +79,7 @@ export default async function Page() {
 
               <button
                 type="submit"
-                className="rounded-md border px-4 py-2 text-sm bg-white hover:bg-gray-100 cursor-pointer min-w-28 text-center"
+                className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
               >
                 Update
               </button>
