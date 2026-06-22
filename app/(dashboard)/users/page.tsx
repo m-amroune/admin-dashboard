@@ -71,19 +71,25 @@ export default async function Page({
         {users.map((user) => (
           <div
             key={user.id}
-            className="flex items-center justify-between rounded-md border p-3 text-sm bg-gray-50 shadow-sm"
+            className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 text-sm shadow-sm"
           >
-            <div>
-              {user.email} - <span className="text-gray-500">{user.role}</span>
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-gray-800">
+                {user.email}
+              </span>
+
+              <span className="w-fit rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm font-medium text-gray-600">
+                {user.role}
+              </span>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex items-center gap-3">
               <form action={toggleRole}>
                 <input type="hidden" name="id" value={user.id} />
                 <input type="hidden" name="role" value={user.role} />
                 <button
                   type="submit"
-                  className="rounded-md border px-4 py-2 text-sm bg-white hover:bg-gray-100 transition min-w-36 text-center cursor-pointer"
+                  className="w-36 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
                 >
                   {user.role === "admin" ? "Remove admin" : "Make admin"}
                 </button>
@@ -93,7 +99,7 @@ export default async function Page({
                 <input type="hidden" name="id" value={user.id} />
                 <button
                   type="submit"
-                  className="rounded-md border px-4 py-2 text-sm bg-white text-red-600 hover:bg-red-50 transition min-w-36 text-center cursor-pointer"
+                  className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition cursor-pointer"
                 >
                   Delete
                 </button>
@@ -105,7 +111,7 @@ export default async function Page({
       {/* Create user */}
       <form
         action={createUser}
-        className="mt-6 flex max-w-md items-center justify-center gap-4"
+        className="mt-8 flex max-w-lg items-center gap-3"
       >
         <input
           type="email"
