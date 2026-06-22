@@ -47,13 +47,23 @@ const page = async () => {
       </div>
 
       {/* Orders breakdown by status */}
-      <ul>
-        {ordersByStatus.map((item) => (
-          <li key={item.status}>
-            {item.status}: {item._count.status}
-          </li>
-        ))}
-      </ul>
+      <div className="max-w-2xl">
+        <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-gray-500">
+          Orders by status
+        </h2>
+
+        <div className="flex gap-3">
+          {ordersByStatus.map((item) => (
+            <div
+              key={item.status}
+              className="rounded-full border border-gray-300 bg-gray-50 px-4 py-2 text-sm"
+            >
+              <span className="capitalize text-gray-600">{item.status}</span>{" "}
+              <span className="font-semibold">{item._count.status}</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Logout action */}
       <form action={logout}>
