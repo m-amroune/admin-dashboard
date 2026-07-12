@@ -26,13 +26,29 @@ async function login() {
 
 export default function Page() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-gray-100 via-gray-200 to-gray-300">
-      <div className="fade-in-up me w-full max-w-lg rounded-lg border border-gray-200 bg-white p-10 shadow-sm text-center text-lg ">
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-slate-50 via-slate-100 to-slate-200">
+      <div className="fade-in-up w-full max-w-lg rounded-2xl border border-white/80 bg-white/95 p-10 text-center text-lg shadow-xl shadow-slate-300/40 backdrop-blur-sm">
         <h1 className=" text-3xl font-semibold tracking-tight">
           Admin Dashboard
         </h1>
         <p className="text-base text-gray-500 mt-1.6">Sign in to continue</p>
-        <form className="mt-4 w-full" action={login}>
+        <form action={login} className="space-y-4">
+          <input
+            type="text"
+            name="username"
+            defaultValue="admin"
+            aria-label="Username"
+            className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-700"
+          />
+
+          <input
+            type="password"
+            name="password"
+            defaultValue="demo1234"
+            aria-label="Password"
+            className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-700"
+          />
+
           <LoginButton />
         </form>
       </div>
