@@ -1,18 +1,5 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
-
-// Server Action: log out the user
-// Deletes the session cookie and redirects to the login page
-async function logout() {
-  "use server";
-
-  const cookieStore = await cookies();
-  cookieStore.delete("dh_session");
-
-  redirect("/login");
-}
 
 // Displays global statistics and provides a logout action
 const page = async () => {
@@ -64,16 +51,6 @@ const page = async () => {
           ))}
         </div>
       </div>
-
-      {/* Logout action */}
-      <form action={logout}>
-        <button
-          type="submit"
-          className="mt-5 rounded-md border px-6 py-2.5 text-base font-medium hover:bg-gray-100 cursor-pointer transition"
-        >
-          Logout
-        </button>
-      </form>
     </div>
   );
 };
