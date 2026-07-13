@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import React from "react";
-import Link from "next/link";
+import { SidebarNav } from "./SidebarNav";
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
   const cookieStore = await cookies();
@@ -10,26 +10,9 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex min-h-screen">
-      <aside className="w-52 border-r p-4">
-        <nav className="flex flex-col items-center gap-2 text-sm">
-          <Link
-            href="/dashboard"
-            className="rounded-md px-6 py-3 text-lg hover:bg-gray-100"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/users"
-            className="rounded-md px-6 py-3 text-lg hover:bg-gray-100"
-          >
-            Users
-          </Link>
-          <Link
-            href="/orders"
-            className="rounded-md px-6 py-3 text-lg hover:bg-gray-100"
-          >
-            Orders
-          </Link>
+      <aside className="w-52 border-r border-slate-200 bg-slate-50 p-4">
+        <nav className="flex flex-col gap-2">
+          <SidebarNav />
         </nav>
       </aside>
 
