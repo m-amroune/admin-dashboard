@@ -4,6 +4,12 @@ Admin dashboard built with Next.js.
 
 ---
 
+**live Demo :** https://admin-dashboard-m-amroune.vercel.app/login
+
+<p align="center">
+  <img src="./assets/admin-dashboard-preview.png" alt="Admin Dashboard preview" width="900" />
+</p>
+
 ## About the Project
 
 ### Objective
@@ -30,7 +36,7 @@ The dashboard includes the following modules:
   Users list, user creation, deletion and role management (user / admin).
 
 - **Orders Management**  
-  Orders list, order detail page and status display.
+  Orders list, order detail page and status management (pending / paid / shipped).
 
 ---
 
@@ -53,7 +59,7 @@ The dashboard includes the following modules:
 - Protected dashboard routes
 - Shared dashboard layout with sidebar navigation
 - Users CRUD operations
-- Orders listing and status display
+- - Orders listing, detail view and status updates
 
 ---
 
