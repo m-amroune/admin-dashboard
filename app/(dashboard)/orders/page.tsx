@@ -70,7 +70,8 @@ export default async function Page() {
               <select
                 name="status"
                 defaultValue={order.status}
-                className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700"
+                aria-label="Order status"
+                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
               >
                 <option value="pending">Pending</option>
                 <option value="paid">Paid</option>
@@ -79,7 +80,7 @@ export default async function Page() {
 
               <button
                 type="submit"
-                className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
+                className="rounded-lg border border-slate-700 bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-600 cursor-pointer"
               >
                 Update
               </button>

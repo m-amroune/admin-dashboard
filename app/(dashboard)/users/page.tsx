@@ -78,7 +78,13 @@ export default async function Page({
                 {user.email}
               </span>
 
-              <span className="w-fit rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm font-medium text-gray-600">
+              <span
+                className={`w-fit rounded-full border px-3 py-1 text-sm font-medium ${
+                  user.role === "admin"
+                    ? "border-blue-200 bg-blue-50 text-blue-700"
+                    : "border-gray-200 bg-gray-50 text-gray-600"
+                }`}
+              >
                 {user.role}
               </span>
             </div>
@@ -89,7 +95,7 @@ export default async function Page({
                 <input type="hidden" name="role" value={user.role} />
                 <button
                   type="submit"
-                  className="w-36 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
+                  className="w-36 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 cursor-pointer"
                 >
                   {user.role === "admin" ? "Remove admin" : "Make admin"}
                 </button>
@@ -117,12 +123,12 @@ export default async function Page({
           type="email"
           name="email"
           placeholder="Email"
-          className="w-64 rounded-md border px-4 py-2 text-base"
+          className="w-64 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-700 outline-none focus:border-blue-500"
         />
 
         <button
           type="submit"
-          className="cursor-pointer rounded-md border px-5 py-2.5 text-base hover:bg-gray-100 transition"
+          className="cursor-pointer rounded-lg border border-slate-700 bg-slate-700 px-5 py-2.5 text-base font-medium text-white transition hover:bg-slate-600"
         >
           Add user
         </button>
