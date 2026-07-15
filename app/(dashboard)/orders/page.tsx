@@ -28,7 +28,7 @@ async function updateOrderStatus(formData: FormData) {
 // Displays the list of orders and allows status updates
 export default async function Page() {
   const orders = await prisma.order.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: { id: "asc" },
   });
 
   return (
