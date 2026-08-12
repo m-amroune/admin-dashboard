@@ -54,15 +54,19 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
           <input type="hidden" name="id" value={order.id} />
 
           <select
-            name="status"
-            defaultValue={order.status}
-            aria-label="Order status"
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
-          >
-            <option value="pending">Pending</option>
-            <option value="paid">Paid</option>
-            <option value="shipped">Shipped</option>
-          </select>
+  name="status"
+  defaultValue=""
+  aria-label="Order status"
+  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+  required
+>
+  <option value="" disabled>
+    Change status...
+  </option>
+  <option value="pending">Pending</option>
+  <option value="paid">Paid</option>
+  <option value="shipped">Shipped</option>
+</select>
 
           <button
             type="submit"

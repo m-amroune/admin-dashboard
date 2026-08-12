@@ -15,17 +15,15 @@ model User {
   name      String?
   role      String   @default("user")
   createdAt DateTime @default(now())
+  orders    Order[]
 }
 
 model Order {
   id        Int      @id @default(autoincrement())
-  email     String
   status    String   @default("pending")
   createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
 }
-
-
-
-
-
-

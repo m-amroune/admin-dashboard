@@ -18,9 +18,12 @@ export default async function Page({
   }
 
   // Fetch order from database
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
-  });
+const order = await prisma.order.findUnique({
+  where: { id: orderId },
+  include: {
+    user: true,
+  },
+});
 
   // Order not found
   if (!order) {
@@ -31,7 +34,7 @@ export default async function Page({
     <div>
       <h1>Order detail</h1>
 
-      <p>Email: {order.email}</p>
+      <p>Email: {order.user.email}</p>
       <p>Status: {order.status}</p>
       <p>Created at: {order.createdAt.toLocaleString()}</p>
     </div>

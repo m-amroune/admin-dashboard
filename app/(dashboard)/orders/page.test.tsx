@@ -14,9 +14,17 @@ const mockFindMany = prisma.order.findMany as jest.Mock;
 
 test("displays orders from the database", async () => {
   mockFindMany.mockResolvedValue([
-    { id: 1, email: "john@example.com", status: "pending" },
-    { id: 2, email: "jane@example.com", status: "paid" },
-  ]);
+  {
+    id: 1,
+    status: "pending",
+    user: { email: "john@example.com" },
+  },
+  {
+    id: 2,
+    status: "paid",
+    user: { email: "jane@example.com" },
+  },
+]);
 
   render(await Page());
 
@@ -25,9 +33,13 @@ test("displays orders from the database", async () => {
 });
 
 test("displays the current order status", async () => {
-  mockFindMany.mockResolvedValue([
-    { id: 1, email: "john@example.com", status: "pending" },
-  ]);
+ mockFindMany.mockResolvedValue([
+  {
+    id: 1,
+    status: "pending",
+    user: { email: "john@example.com" },
+  },
+]);
 
   render(await Page());
 
@@ -36,8 +48,12 @@ test("displays the current order status", async () => {
 
 test("displays the order detail link", async () => {
   mockFindMany.mockResolvedValue([
-    { id: 1, email: "john@example.com", status: "pending" },
-  ]);
+  {
+    id: 1,
+    status: "pending",
+    user: { email: "john@example.com" },
+  },
+]);
 
   render(await Page());
 

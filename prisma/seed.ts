@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+   await prisma.order.deleteMany();
   await prisma.user.deleteMany();
   await prisma.user.createMany({
     data: [
@@ -12,14 +13,53 @@ async function main() {
     ],
   });
 
-  await prisma.order.deleteMany();
-  await prisma.order.createMany({
-    data: [
-      { email: "john.doe@example.com", status: "pending" },
-      { email: "jane.doe@example.com", status: "paid" },
-      { email: "jack.doe@example.com", status: "shipped" },
-    ],
-  });
+
+ await Promise.all([
+  prisma.order.create({
+    data: {
+      status: "pending",
+      user: {
+        connect: { email: "john.doe@example.com" },
+      },
+    },
+  }),
+
+  prisma.order.create({
+    data: {
+      status: "paid",
+      user: {
+        connect: { email: "john.doe@example.com" },
+      },
+    },
+  }),
+
+  prisma.order.create({
+    data: {
+      status: "paid",
+      user: {
+        connect: { email: "jane.doe@example.com" },
+      },
+    },
+  }),
+
+  prisma.order.create({
+    data: {
+      status: "shipped",
+      user: {
+        connect: { email: "jane.doe@example.com" },
+      },
+    },
+  }),
+
+  prisma.order.create({
+    data: {
+      status: "shipped",
+      user: {
+        connect: { email: "jack.doe@example.com" },
+      },
+    },
+  }),
+]);
 
   console.log("Seed done");
 }
