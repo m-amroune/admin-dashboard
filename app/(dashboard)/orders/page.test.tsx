@@ -7,10 +7,24 @@ jest.mock("@/lib/prisma", () => ({
     order: {
       findMany: jest.fn(),
     },
+    user: {
+      findMany: jest.fn(),
+    },
   },
 }));
 
 const mockFindMany = prisma.order.findMany as jest.Mock;
+const mockUserFindMany = prisma.user.findMany as jest.Mock;
+
+beforeEach(() => {
+  mockUserFindMany.mockResolvedValue([
+    {
+      id: 1,
+      email: "john@example.com",
+      name: "John Doe",
+    },
+  ]);
+});
 
 test("displays orders from the database", async () => {
   mockFindMany.mockResolvedValue([

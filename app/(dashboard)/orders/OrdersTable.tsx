@@ -7,7 +7,7 @@ import {
   type ColumnDef,
 } from "@tanstack/react-table";
 
-import { updateOrderStatus } from "./actions";
+import { deleteOrder, updateOrderStatus } from "./actions";
 
 export type OrderRow = {
   id: number;
@@ -49,36 +49,57 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
     cell: (info) => {
       const order = info.row.original;
 
-      return (
-        <form action={updateOrderStatus} className="flex items-center gap-3">
-          <input type="hidden" name="id" value={order.id} />
+    return (
+  <div className="flex items-center gap-2">
+    <form action={updateOrderStatus} className="flex items-center gap-2">
+      <input type="hidden" name="id" value={order.id} />
 
-          <select
-  name="status"
-  defaultValue=""
-  aria-label="Order status"
-  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
-  required
->
-  <option value="" disabled>
-    Change status...
-  </option>
-  <option value="pending">Pending</option>
-  <option value="paid">Paid</option>
-  <option value="shipped">Shipped</option>
-</select>
+      <select
+        name="status"
+        defaultValue=""
+        required
+        aria-label="Order status"
+        className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+      >
+        <option value="" disabled>
+          Change status...
+        </option>
+        <option value="pending">Pending</option>
+        <option value="paid">Paid</option>
+        <option value="shipped">Shipped</option>
+      </select>
 
-          <button
-            type="submit"
-            className="cursor-pointer rounded-lg border border-slate-700 bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-600"
-          >
-            Update
-          </button>
-        </form>
-      );
-    },
+      <button
+        type="submit"
+        className="cursor-pointer rounded-lg border border-slate-700 bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-600"
+      >
+        Update
+      </button>
+    </form>
+
+    <form
+      action={deleteOrder}
+      onSubmit={(event) => {
+        if (!window.confirm("Delete this order?")) {
+          event.preventDefault();
+        }
+      }}
+    >
+      <input type="hidden" name="id" value={order.id} />
+
+      <button
+        type="submit"
+        className="cursor-pointer rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+      >
+        Delete
+      </button>
+    </form>
+  </div>
+    );
   },
+},
 ];
+
 
 export default function OrdersTable({ data }: { data: OrderRow[] }) {
   const table = useTable(
@@ -99,7 +120,7 @@ export default function OrdersTable({ data }: { data: OrderRow[] }) {
       {table.getRowModel().rows.map((row) => (
         <div
           key={row.id}
-          className="grid gap-3 rounded-xl border border-gray-200 bg-white p-4 text-sm shadow-sm md:grid-cols-[1fr_auto_auto] md:items-center"
+          className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 text-sm shadow-sm md:grid-cols-[minmax(180px,1fr)_auto_auto] md:items-center"
         >
           {row.getAllCells().map((cell) => (
             <div key={cell.id}>
