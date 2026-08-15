@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import {
+  createSortedRowModel,
+  rowSortingFeature,
+  sortFn_text,
   tableFeatures,
   useTable,
   type ColumnDef,
@@ -15,12 +18,19 @@ export type OrderRow = {
   status: string;
 };
 
-const features = tableFeatures({});
+const features = tableFeatures({
+  rowSortingFeature,
+  sortedRowModel: createSortedRowModel(),
+  sortFns: {
+    text: sortFn_text,
+  },
+});
 
 const columns: Array<ColumnDef<typeof features, OrderRow>> = [
   {
     accessorKey: "email",
     header: "Email",
+    sortFn: "text",
     cell: (info) => {
       const order = info.row.original;
 
@@ -37,6 +47,7 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
   {
     accessorKey: "status",
     header: "Status",
+    sortFn: "text",
     cell: (info) => (
       <span className="w-fit rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium capitalize text-gray-600">
         {String(info.getValue())}
@@ -56,14 +67,12 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
 
       <select
         name="status"
-        defaultValue=""
+        defaultValue={order.status}
         required
         aria-label="Order status"
         className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
       >
-        <option value="" disabled>
-          Change status...
-        </option>
+       
         <option value="pending">Pending</option>
         <option value="paid">Paid</option>
         <option value="shipped">Shipped</option>
@@ -89,7 +98,7 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
 
       <button
         type="submit"
-        className="cursor-pointer rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+       className="cursor-pointer rounded-lg border border-red-200 px-4 py-2 text-base font-medium text-red-600 transition hover:bg-red-50"
       >
         Delete
       </button>
@@ -111,24 +120,66 @@ export default function OrdersTable({ data }: { data: OrderRow[] }) {
     (state) => state,
   );
 
+  const emailColumn = table.getColumn("email");
+const statusColumn = table.getColumn("status");
   if (data.length === 0) {
     return <p className="mb-4 text-sm text-gray-500">No orders found.</p>;
   }
 
-  return (
-    <div className="space-y-2">
-      {table.getRowModel().rows.map((row) => (
-        <div
-          key={row.id}
-          className="grid gap-4 rounded-xl border border-slate-200 bg-white p-4 text-sm shadow-sm md:grid-cols-[minmax(180px,1fr)_auto_auto] md:items-center"
-        >
-          {row.getAllCells().map((cell) => (
-            <div key={cell.id}>
-              <table.FlexRender cell={cell} />
-            </div>
-          ))}
+return (
+  <div>
+    <div className="mb-4 flex items-center gap-2">
+      <span className="text-sm text-slate-500">Sort by :</span>
+
+      <button
+        type="button"
+        onClick={emailColumn?.getToggleSortingHandler()}
+       className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition ${
+  emailColumn?.getIsSorted()
+    ? "bg-blue-600 text-white shadow-sm hover:bg-blue-500"
+    : "border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200"
+}`}
+      >
+        Email
+        {emailColumn?.getIsSorted() === "asc" && " ↑"}
+        {emailColumn?.getIsSorted() === "desc" && " ↓"}
+      </button>
+
+      <button
+        type="button"
+        onClick={statusColumn?.getToggleSortingHandler()}
+        className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition ${
+  statusColumn?.getIsSorted()
+    ? "bg-blue-600 text-white shadow-sm hover:bg-blue-500"
+    : "border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200"
+}`}
+      >
+        Status
+        {statusColumn?.getIsSorted() === "asc" && " ↑"}
+        {statusColumn?.getIsSorted() === "desc" && " ↓"}
+      </button>
+    </div>
+
+   <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-sm">
+ 
+  {table.getRowModel().rows.map((row) => (
+    <div
+      key={row.id}
+      className="grid gap-5 border-b border-slate-200 px-5 py-4 text-base last:border-b-0 md:grid-cols-[210px_auto] md:items-center"
+    >
+      {row
+  .getAllCells()
+  .filter((cell) => cell.column.id !== "status")
+  .map((cell) => (
+        <div key={cell.id}>
+          <table.FlexRender cell={cell} />
         </div>
       ))}
     </div>
-  );
+  ))}
+</div>
+        </div>
+
+);
+  
 }

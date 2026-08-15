@@ -7,9 +7,16 @@ export const dynamic = "force-dynamic";
 async function createUser(formData: FormData) {
   "use server";
   const email = String(formData.get("email") || "").trim();
-  if (!email) redirect("/users?error=missing_email");
+const name = String(formData.get("name") || "").trim();
 
-  await prisma.user.create({ data: { email } });
+if (!email) redirect("/users?error=missing_email");
+
+await prisma.user.create({
+  data: {
+    email,
+    name: name || null,
+  },
+});
   redirect("/users?created=1");
 }
 
@@ -117,18 +124,24 @@ export default async function Page({
       {/* Create user */}
       <form
         action={createUser}
-        className="mt-8 flex max-w-lg items-center gap-3"
+        className="mt-10 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-center"
       >
+        <input
+  type="text"
+  name="name"
+  placeholder="Name (optional)"
+  className="h-12 min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-4 text-base text-slate-700 outline-none transition focus:border-blue-500"
+/>
         <input
           type="email"
           name="email"
           placeholder="Email"
-          className="w-64 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-base text-gray-700 outline-none focus:border-blue-500"
+          className="h-12 min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-4 text-base text-slate-700 outline-none transition focus:border-blue-500"
         />
 
         <button
           type="submit"
-          className="cursor-pointer rounded-lg border border-slate-700 bg-slate-700 px-5 py-2.5 text-base font-medium text-white transition hover:bg-slate-600"
+          className="h-12 shrink-0 whitespace-nowrap rounded-lg bg-slate-800 px-6 text-base font-semibold text-white transition hover:bg-slate-700"
         >
           Add user
         </button>
