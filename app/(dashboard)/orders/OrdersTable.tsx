@@ -11,6 +11,8 @@ import {
 createFilteredRowModel,
 filterFn_includesString,
 filterFn_equalsString,
+createPaginatedRowModel,
+rowPaginationFeature,
   type ColumnDef,
 } from "@tanstack/react-table";
 
@@ -25,8 +27,10 @@ export type OrderRow = {
 const features = tableFeatures({
   columnFilteringFeature,
   rowSortingFeature,
+   rowPaginationFeature,
   filteredRowModel: createFilteredRowModel(),
   sortedRowModel: createSortedRowModel(),
+  paginatedRowModel: createPaginatedRowModel(),
   filterFns: {
     includesString: filterFn_includesString,
       equalsString: filterFn_equalsString,
@@ -123,14 +127,20 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
 
 
 export default function OrdersTable({ data }: { data: OrderRow[] }) {
-  const table = useTable(
-    {
-      features,
-      columns,
-      data,
+ const table = useTable(
+  {
+    features,
+    columns,
+    data,
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: 5,
+      },
     },
-    (state) => state,
-  );
+  },
+  (state) => state,
+);
 
   const emailColumn = table.getColumn("email");
 const statusColumn = table.getColumn("status");
@@ -196,6 +206,30 @@ return (
     </div>
 
    <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-sm">
+
+    <div className="mt-4 flex items-center gap-3">
+  <button
+    type="button"
+    onClick={() => table.previousPage()}
+    disabled={!table.getCanPreviousPage()}
+    className="cursor-pointer rounded-lg border border-slate-200 bg-white px-4 py-2 text-base font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+  >
+    Previous
+  </button>
+
+  <span className="text-base text-slate-600">
+    Page {table.state.pagination.pageIndex + 1} of {table.getPageCount()}
+  </span>
+
+  <button
+    type="button"
+    onClick={() => table.nextPage()}
+    disabled={!table.getCanNextPage()}
+    className="cursor-pointer rounded-lg border border-slate-200 bg-white px-4 py-2 text-base font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+  >
+    Next
+  </button>
+</div>
  
   {table.getRowModel().rows.map((row) => (
     <div
