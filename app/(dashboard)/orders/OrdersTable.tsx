@@ -7,6 +7,10 @@ import {
   sortFn_text,
   tableFeatures,
   useTable,
+  columnFilteringFeature,
+createFilteredRowModel,
+filterFn_includesString,
+filterFn_equalsString,
   type ColumnDef,
 } from "@tanstack/react-table";
 
@@ -19,8 +23,14 @@ export type OrderRow = {
 };
 
 const features = tableFeatures({
+  columnFilteringFeature,
   rowSortingFeature,
+  filteredRowModel: createFilteredRowModel(),
   sortedRowModel: createSortedRowModel(),
+  filterFns: {
+    includesString: filterFn_includesString,
+      equalsString: filterFn_equalsString,
+  },
   sortFns: {
     text: sortFn_text,
   },
@@ -31,6 +41,7 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
     accessorKey: "email",
     header: "Email",
     sortFn: "text",
+    filterFn: "includesString",
     cell: (info) => {
       const order = info.row.original;
 
@@ -48,6 +59,7 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
     accessorKey: "status",
     header: "Status",
     sortFn: "text",
+    filterFn: "equalsString",
     cell: (info) => (
       <span className="w-fit rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium capitalize text-gray-600">
         {String(info.getValue())}
@@ -129,7 +141,30 @@ const statusColumn = table.getColumn("status");
 return (
   <div>
     <div className="mb-4 flex items-center gap-2">
-      <span className="text-sm text-slate-500">Sort by :</span>
+  <input
+  type="search"
+  value={(emailColumn?.getFilterValue() ?? "") as string}
+  onChange={(event) => emailColumn?.setFilterValue(event.target.value)}
+  placeholder="Search by email..."
+  aria-label="Search orders by email"
+  className="w-64 rounded-lg border border-slate-200 bg-white px-4 py-2 text-base text-slate-700 outline-none transition focus:border-blue-500"
+/>
+<select
+  value={(statusColumn?.getFilterValue() ?? "") as string}
+  onChange={(event) =>
+    statusColumn?.setFilterValue(event.target.value || undefined)
+  }
+  aria-label="Filter orders by status"
+  className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-base text-slate-700 outline-none transition focus:border-blue-500"
+>
+  <option value="">All statuses</option>
+  <option value="pending">Pending</option>
+  <option value="paid">Paid</option>
+  <option value="shipped">Shipped</option>
+</select>
+      <span className="shrink-0 whitespace-nowrap text-base text-slate-500">
+  Sort by :
+</span>
 
       <button
         type="button"
