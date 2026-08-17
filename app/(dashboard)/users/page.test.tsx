@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { prisma } from "@/lib/prisma";
 import Page from "./page";
 
@@ -54,4 +54,35 @@ test("displays the empty state when there are no users", async () => {
   render(await Page({}));
 
   expect(screen.getByText("No users found.")).toBeInTheDocument();
+});
+
+test("filters users by name or email", async () => {
+  mockFindMany.mockResolvedValue([
+    {
+      id: 1,
+      name: "John Doe",
+      email: "john@example.com",
+      role: "user",
+    },
+    {
+      id: 2,
+      name: "Jane Smith",
+      email: "jane@example.com",
+      role: "admin",
+    },
+  ]);
+
+  render(await Page({}));
+
+  fireEvent.change(
+    screen.getByRole("searchbox", {
+      name: "Search users by name or email",
+    }),
+    {
+      target: { value: "Jane" },
+    },
+  );
+
+  expect(screen.getByText("jane@example.com")).toBeInTheDocument();
+  expect(screen.queryByText("john@example.com")).not.toBeInTheDocument();
 });
