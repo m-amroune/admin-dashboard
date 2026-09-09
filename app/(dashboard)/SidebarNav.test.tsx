@@ -19,8 +19,8 @@ test("marks Dashboard as active on dashboard route", () => {
   render(<SidebarNav />);
 
   expect(screen.getByRole("link", { name: "Dashboard" })).toHaveClass(
-    "bg-slate-700",
-    "text-white",
+    "bg-blue-600",
+"text-white",
   );
 });
 
@@ -30,8 +30,8 @@ test("marks Users as active on users route", () => {
   render(<SidebarNav />);
 
   expect(screen.getByRole("link", { name: "Users" })).toHaveClass(
-    "bg-slate-700",
-    "text-white",
+    "bg-blue-600",
+"text-white",
   );
 });
 
@@ -41,7 +41,7 @@ test("marks Orders as active on order detail route", () => {
   render(<SidebarNav />);
 
   expect(screen.getByRole("link", { name: "Orders" })).toHaveClass(
-    "bg-slate-700",
-    "text-white",
+    "bg-blue-600",
+"text-white",
   );
 });
