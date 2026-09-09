@@ -13,10 +13,11 @@ async function main() {
     ],
   });
 
-
- await Promise.all([
+await Promise.all([
   prisma.order.create({
     data: {
+      reference: "ORD-SEED-001",
+      amountCents: 4990,
       status: "pending",
       user: {
         connect: { email: "john.doe@example.com" },
@@ -26,6 +27,8 @@ async function main() {
 
   prisma.order.create({
     data: {
+      reference: "ORD-SEED-002",
+      amountCents: 12990,
       status: "paid",
       user: {
         connect: { email: "john.doe@example.com" },
@@ -35,6 +38,8 @@ async function main() {
 
   prisma.order.create({
     data: {
+      reference: "ORD-SEED-003",
+      amountCents: 7590,
       status: "paid",
       user: {
         connect: { email: "jane.doe@example.com" },
@@ -44,6 +49,8 @@ async function main() {
 
   prisma.order.create({
     data: {
+      reference: "ORD-SEED-004",
+      amountCents: 18900,
       status: "shipped",
       user: {
         connect: { email: "jane.doe@example.com" },
@@ -53,6 +60,8 @@ async function main() {
 
   prisma.order.create({
     data: {
+      reference: "ORD-SEED-005",
+      amountCents: 3490,
       status: "shipped",
       user: {
         connect: { email: "jack.doe@example.com" },
@@ -60,6 +69,8 @@ async function main() {
     },
   }),
 ]);
+
+
 
   console.log("Seed done");
 }

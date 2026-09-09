@@ -86,3 +86,114 @@ test("filters users by name or email", async () => {
   expect(screen.getByText("jane@example.com")).toBeInTheDocument();
   expect(screen.queryByText("john@example.com")).not.toBeInTheDocument();
 });
+
+test("filters users by role", async () => {
+  mockFindMany.mockResolvedValue([
+    {
+      id: 1,
+      name: "John Doe",
+      email: "john@example.com",
+      role: "user",
+    },
+    {
+      id: 2,
+      name: "Jane Smith",
+      email: "jane@example.com",
+      role: "admin",
+    },
+  ]);
+
+  render(await Page({}));
+
+  fireEvent.change(
+    screen.getByLabelText("Filter users by role"),
+    {
+      target: { value: "admin" },
+    },
+  );
+
+  expect(screen.getByText("jane@example.com")).toBeInTheDocument();
+  expect(screen.queryByText("john@example.com")).not.toBeInTheDocument();
+});
+
+test("sorts users by email", async () => {
+  mockFindMany.mockResolvedValue([
+    {
+      id: 1,
+      name: null,
+      email: "zoe@example.com",
+      role: "user",
+    },
+    {
+      id: 2,
+      name: null,
+      email: "alice@example.com",
+      role: "admin",
+    },
+  ]);
+
+  render(await Page({}));
+
+  fireEvent.click(screen.getByRole("button", { name: "Email" }));
+
+  const emails = [
+    screen.getByText("alice@example.com"),
+    screen.getByText("zoe@example.com"),
+  ];
+
+  expect(
+    emails[0].compareDocumentPosition(emails[1]) &
+      Node.DOCUMENT_POSITION_FOLLOWING,
+  ).toBeTruthy();
+});
+
+test("sorts users by role", async () => {
+  mockFindMany.mockResolvedValue([
+    {
+      id: 1,
+      name: null,
+      email: "user@example.com",
+      role: "user",
+    },
+    {
+      id: 2,
+      name: null,
+      email: "admin@example.com",
+      role: "admin",
+    },
+  ]);
+
+  render(await Page({}));
+
+  fireEvent.click(screen.getByRole("button", { name: "Role" }));
+
+  const adminEmail = screen.getByText("admin@example.com");
+  const userEmail = screen.getByText("user@example.com");
+
+  expect(
+    adminEmail.compareDocumentPosition(userEmail) &
+      Node.DOCUMENT_POSITION_FOLLOWING,
+  ).toBeTruthy();
+});
+
+test("paginates users", async () => {
+  mockFindMany.mockResolvedValue(
+    Array.from({ length: 6 }, (_, index) => ({
+      id: index + 1,
+      name: null,
+      email: `user${index + 1}@example.com`,
+      role: "user",
+    })),
+  );
+
+  render(await Page({}));
+
+  expect(screen.getByText("user1@example.com")).toBeInTheDocument();
+  expect(screen.getByText("user5@example.com")).toBeInTheDocument();
+  expect(screen.queryByText("user6@example.com")).not.toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole("button", { name: "Next" }));
+
+  expect(screen.getByText("user6@example.com")).toBeInTheDocument();
+  expect(screen.queryByText("user1@example.com")).not.toBeInTheDocument();
+});

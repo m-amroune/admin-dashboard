@@ -20,6 +20,8 @@ import { deleteOrder, updateOrderStatus } from "./actions";
 
 export type OrderRow = {
   id: number;
+  reference: string;
+  amountCents: number | null;
   email: string;
   status: string;
 };
@@ -41,6 +43,22 @@ const features = tableFeatures({
 });
 
 const columns: Array<ColumnDef<typeof features, OrderRow>> = [
+  {
+  accessorKey: "reference",
+  header: "Reference",
+  sortFn: "text",
+},
+{
+  accessorKey: "amountCents",
+  header: "Amount",
+  cell: (info) => {
+    const amountCents = info.getValue<number | null>();
+
+    return amountCents === null
+      ? "Not set"
+      : `${(amountCents / 100).toFixed(2)} €`;
+  },
+},
   {
     accessorKey: "email",
     header: "Email",
@@ -234,7 +252,7 @@ return (
   {table.getRowModel().rows.map((row) => (
     <div
       key={row.id}
-      className="grid gap-5 border-b border-slate-200 px-5 py-4 text-base last:border-b-0 md:grid-cols-[210px_auto] md:items-center"
+      className="grid gap-4 border-b border-slate-200 px-5 py-4 text-base last:border-b-0 md:grid-cols-[140px_110px_220px_auto] md:items-center"
     >
       {row
   .getAllCells()

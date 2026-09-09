@@ -27,11 +27,13 @@ const [orders, users] = await Promise.all([
 
 const orderRows = orders.map((order) => ({
   id: order.id,
+  reference: order.reference,
+  amountCents: order.amountCents,
   email: order.user.email,
   status: order.status,
 }));
   return (
-    <div className="max-w-xl">
+    <div className="max-w-4xl">
       <h1 className="mb-6 text-2xl font-semibold">Orders</h1>
 
      
@@ -70,6 +72,23 @@ const orderRows = orders.map((order) => ({
         ))}
       </select>
     </div>
+
+    <div>
+  <label htmlFor="amount" className="sr-only">
+    Amount
+  </label>
+
+  <input
+    id="amount"
+    name="amount"
+    type="number"
+    min="0.01"
+    step="0.01"
+    required
+    placeholder="Amount"
+    className="w-32 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+  />
+</div>
 
     <input type="hidden" name="status" value="pending" />
 

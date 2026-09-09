@@ -18,12 +18,12 @@ export default async function Page({
   }
 
   // Fetch order from database
-const order = await prisma.order.findUnique({
-  where: { id: orderId },
-  include: {
-    user: true,
-  },
-});
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      user: true,
+    },
+  });
 
   // Order not found
   if (!order) {
@@ -33,10 +33,27 @@ const order = await prisma.order.findUnique({
   return (
     <div>
       <h1>Order detail</h1>
+      <p>Reference: {order.reference}</p>
+
+      <p>
+        Amount:{" "}
+        {order.amountCents === null
+          ? "Not set"
+          : `${(order.amountCents / 100).toFixed(2)} €`}
+      </p>
+      <p>Reference: {order.reference}</p>
+
+      <p>
+        Amount:{" "}
+        {order.amountCents === null
+          ? "Not set"
+          : `${(order.amountCents / 100).toFixed(2)} €`}
+      </p>
 
       <p>Email: {order.user.email}</p>
       <p>Status: {order.status}</p>
       <p>Created at: {order.createdAt.toLocaleString()}</p>
+      <p>Updated at: {order.updatedAt.toLocaleString()}</p>
     </div>
   );
 }
