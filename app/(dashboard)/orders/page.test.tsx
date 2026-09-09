@@ -20,6 +20,8 @@ beforeEach(() => {
   mockUserFindMany.mockResolvedValue([
     {
       id: 1,
+      reference: "ORD-TEST-001",
+      amountCents: 4990,
       email: "john@example.com",
       name: "John Doe",
     },
@@ -28,17 +30,17 @@ beforeEach(() => {
 
 test("displays orders from the database", async () => {
   mockFindMany.mockResolvedValue([
-  {
-    id: 1,
-    status: "pending",
-    user: { email: "john@example.com" },
-  },
-  {
-    id: 2,
-    status: "paid",
-    user: { email: "jane@example.com" },
-  },
-]);
+    {
+      id: 1,
+      status: "pending",
+      user: { email: "john@example.com" },
+    },
+    {
+      id: 2,
+      status: "paid",
+      user: { email: "jane@example.com" },
+    },
+  ]);
 
   render(await Page());
 
@@ -47,35 +49,35 @@ test("displays orders from the database", async () => {
 });
 
 test("displays the current order status", async () => {
- mockFindMany.mockResolvedValue([
-  {
-    id: 1,
-    status: "pending",
-    user: { email: "john@example.com" },
-  },
-]);
+  mockFindMany.mockResolvedValue([
+    {
+      id: 1,
+      status: "pending",
+      user: { email: "john@example.com" },
+    },
+  ]);
 
   render(await Page());
 
-  expect(
-  screen.getByRole("combobox", { name: "Order status" }),
-).toHaveValue("pending")
+  expect(screen.getByRole("combobox", { name: "Order status" })).toHaveValue(
+    "pending",
+  );
 });
 
 test("displays the order detail link", async () => {
   mockFindMany.mockResolvedValue([
-  {
-    id: 1,
-    status: "pending",
-    user: { email: "john@example.com" },
-  },
-]);
+    {
+      id: 1,
+      status: "pending",
+      user: { email: "john@example.com" },
+    },
+  ]);
 
   render(await Page());
 
   expect(
-  screen.getByRole("link", { name: "john@example.com" }),
-).toHaveAttribute("href", "/orders/1");
+    screen.getByRole("link", { name: "john@example.com" }),
+  ).toHaveAttribute("href", "/orders/1");
 });
 
 test("displays the empty state when there are no orders", async () => {
@@ -129,12 +131,9 @@ test("filters orders by status", async () => {
 
   render(await Page());
 
-  fireEvent.change(
-    screen.getByLabelText("Filter orders by status"),
-    {
-      target: { value: "paid" },
-    },
-  );
+  fireEvent.change(screen.getByLabelText("Filter orders by status"), {
+    target: { value: "paid" },
+  });
 
   expect(screen.getByText("jane@example.com")).toBeInTheDocument();
   expect(screen.queryByText("john@example.com")).not.toBeInTheDocument();
@@ -187,4 +186,21 @@ test("paginates orders", async () => {
 
   expect(screen.getByText("user6@example.com")).toBeInTheDocument();
   expect(screen.queryByText("user1@example.com")).not.toBeInTheDocument();
+});
+
+test("displays order reference and amount", async () => {
+  mockFindMany.mockResolvedValue([
+    {
+      id: 1,
+      reference: "ORD-TEST-001",
+      amountCents: 4990,
+      status: "pending",
+      user: { email: "john@example.com" },
+    },
+  ]);
+
+  render(await Page());
+
+  expect(screen.getByText("ORD-TEST-001")).toBeInTheDocument();
+  expect(screen.getByText("49.90 €")).toBeInTheDocument();
 });
