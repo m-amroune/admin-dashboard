@@ -15,6 +15,13 @@ const page = async () => {
     _count: { status: true },
   });
 
+  const statusOrder = ["pending", "paid", "shipped"];
+
+ordersByStatus.sort(
+  (a, b) =>
+    statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status),
+);
+
   return (
     <div className="fade-in-up">
       <h1 className="mb-8 text-3xl font-bold tracking-tight text-gray-800">
@@ -34,22 +41,22 @@ const page = async () => {
       </div>
 
       {/* Orders breakdown by status */}
-      <div className="max-w-2xl">
-        <h2 className="mb-4 inline-flex rounded-md bg-amber-50 px-3 py-1.5 text-[15px] font-bold uppercase tracking-wide text-amber-900">
+      <div className="max-w-2xl rounded-xl border border-slate-200 border-t-4 border-t-amber-400 bg-white p-5 shadow-sm">
+        <h2 className="text-sm font-semibold text-slate-700">
           Orders by status
         </h2>
 
-        <div className="flex gap-3">
+        <div className="mt-5 space-y-4">
           {ordersByStatus.map((item) => (
             <div
               key={item.status}
-              className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm"
+              className="flex items-center justify-between"
             >
-              <span className="font-medium capitalize text-slate-600">
+              <span className="text-sm font-medium capitalize text-slate-600">
                 {item.status}
               </span>
 
-              <span className="flex h-7 min-w-7 items-center justify-center rounded-md border border-amber-200 bg-white px-2 text-sm font-bold text-amber-800">
+              <span className="flex min-w-8 items-center justify-center rounded-full bg-slate-100 px-2.5 py-1 text-sm font-semibold text-slate-700">
                 {item._count.status}
               </span>
             </div>
