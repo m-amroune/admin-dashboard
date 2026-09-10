@@ -13,63 +13,52 @@ async function main() {
     ],
   });
 
-await Promise.all([
-  prisma.order.create({
+// Seed orders in a predictable chronological order
+const orders = [
+  {
+    reference: "ORD-SEED-001",
+    amountCents: 4990,
+    status: "pending",
+    email: "john.doe@example.com",
+  },
+  {
+    reference: "ORD-SEED-002",
+    amountCents: 12990,
+    status: "paid",
+    email: "john.doe@example.com",
+  },
+  {
+    reference: "ORD-SEED-003",
+    amountCents: 7590,
+    status: "paid",
+    email: "jane.doe@example.com",
+  },
+  {
+    reference: "ORD-SEED-004",
+    amountCents: 18900,
+    status: "shipped",
+    email: "jane.doe@example.com",
+  },
+  {
+    reference: "ORD-SEED-005",
+    amountCents: 3490,
+    status: "shipped",
+    email: "jack.doe@example.com",
+  },
+];
+
+for (const order of orders) {
+  await prisma.order.create({
     data: {
-      reference: "ORD-SEED-001",
-      amountCents: 4990,
-      status: "pending",
+      reference: order.reference,
+      amountCents: order.amountCents,
+      status: order.status,
       user: {
-        connect: { email: "john.doe@example.com" },
+        connect: { email: order.email },
       },
     },
-  }),
-
-  prisma.order.create({
-    data: {
-      reference: "ORD-SEED-002",
-      amountCents: 12990,
-      status: "paid",
-      user: {
-        connect: { email: "john.doe@example.com" },
-      },
-    },
-  }),
-
-  prisma.order.create({
-    data: {
-      reference: "ORD-SEED-003",
-      amountCents: 7590,
-      status: "paid",
-      user: {
-        connect: { email: "jane.doe@example.com" },
-      },
-    },
-  }),
-
-  prisma.order.create({
-    data: {
-      reference: "ORD-SEED-004",
-      amountCents: 18900,
-      status: "shipped",
-      user: {
-        connect: { email: "jane.doe@example.com" },
-      },
-    },
-  }),
-
-  prisma.order.create({
-    data: {
-      reference: "ORD-SEED-005",
-      amountCents: 3490,
-      status: "shipped",
-      user: {
-        connect: { email: "jack.doe@example.com" },
-      },
-    },
-  }),
-]);
-
+  });
+}
 
 
   console.log("Seed done");
