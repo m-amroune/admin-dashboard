@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import React from "react";
 import { SidebarNav } from "./SidebarNav";
+import { MobileNav } from "./MobileNav";
 import { UserRound } from "lucide-react";
 
 async function logout() {
@@ -20,7 +21,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex min-h-screen">
-      <aside className="flex w-52 flex-col border-r border-slate-200 bg-slate-50 p-4">
+      <aside className="hidden w-52 flex-col border-r border-slate-200 bg-slate-50 p-4 md:flex">
         <SidebarNav />
 
         <form action={logout} className="mt-6 border-t border-slate-200 pt-4">
@@ -34,7 +35,11 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
       </aside>
 
       <div className="min-w-0 flex-1">
-        <header className="flex h-16 items-center justify-end border-b border-slate-200 bg-white px-6">
+        <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 md:justify-end md:px-6">
+          {/* Mobile navigation */}
+          <MobileNav logoutAction={logout} />
+
+          {/* Admin profile */}
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-blue-600">
               <UserRound size={20} strokeWidth={1.8} />
@@ -44,7 +49,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
           </div>
         </header>
 
-        <main className="p-6">{children}</main>
+        <main className="p-4 md:p-6">{children}</main>
       </div>
     </div>
   );
