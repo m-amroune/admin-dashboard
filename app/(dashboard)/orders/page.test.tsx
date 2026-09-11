@@ -202,5 +202,5 @@ test("displays order reference and amount", async () => {
   render(await Page());
 
   expect(screen.getByText("ORD-TEST-001")).toBeInTheDocument();
-  expect(screen.getByText("49.90 €")).toBeInTheDocument();
+  expect(screen.getByText("$49.90")).toBeInTheDocument();
 });

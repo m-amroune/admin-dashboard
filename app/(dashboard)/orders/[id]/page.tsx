@@ -39,7 +39,7 @@ export default async function Page({
         Amount:{" "}
         {order.amountCents === null
           ? "Not set"
-          : `${(order.amountCents / 100).toFixed(2)} €`}
+          : `$${(order.amountCents / 100).toFixed(2)}`}
       </p>
       <p>Reference: {order.reference}</p>
 
