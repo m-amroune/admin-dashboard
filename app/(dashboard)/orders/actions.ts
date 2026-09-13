@@ -26,12 +26,12 @@ export async function createOrder(formData: FormData) {
 
   const amount = Number(formData.get("amount"));
 
-if (!Number.isFinite(amount) || amount <= 0) {
-  return;
-}
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return;
+  }
 
-const amountCents = Math.round(amount * 100);
-const reference = `ORD-${randomUUID().slice(0, 8).toUpperCase()}`;
+  const amountCents = Math.round(amount * 100);
+  const reference = `ORD-${randomUUID().slice(0, 8).toUpperCase()}`;
 
   if (!Number.isInteger(userId)) {
     return;
@@ -41,14 +41,14 @@ const reference = `ORD-${randomUUID().slice(0, 8).toUpperCase()}`;
     return;
   }
 
-await prisma.order.create({
-  data: {
-    userId,
-    status,
-    reference,
-    amountCents,
-  },
-});
+  await prisma.order.create({
+    data: {
+      userId,
+      status,
+      reference,
+      amountCents,
+    },
+  });
 
   redirect("/orders");
 }
@@ -62,6 +62,51 @@ export async function deleteOrder(formData: FormData) {
 
   await prisma.order.delete({
     where: { id },
+  });
+
+  redirect("/orders");
+}
+
+export async function updateOrdersStatus(formData: FormData) {
+  const ids = formData.getAll("ids").map(Number).filter(Number.isInteger);
+
+  const status = String(formData.get("status"));
+
+  if (ids.length === 0) {
+    return;
+  }
+
+  if (!["paid", "shipped"].includes(status)) {
+    return;
+  }
+
+  await prisma.order.updateMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
+    data: {
+      status,
+    },
+  });
+
+  redirect("/orders");
+}
+
+export async function deleteOrders(formData: FormData) {
+  const ids = formData.getAll("ids").map(Number).filter(Number.isInteger);
+
+  if (ids.length === 0) {
+    return;
+  }
+
+  await prisma.order.deleteMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
   });
 
   redirect("/orders");
