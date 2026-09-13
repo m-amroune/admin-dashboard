@@ -204,3 +204,81 @@ test("displays order reference and amount", async () => {
   expect(screen.getByText("ORD-TEST-001")).toBeInTheDocument();
   expect(screen.getByText("$49.90")).toBeInTheDocument();
 });
+
+test("selects an order and displays the selected count", async () => {
+  mockFindMany.mockResolvedValue([
+    {
+      id: 1,
+      reference: "ORD-TEST-001",
+      amountCents: 4990,
+      status: "pending",
+      user: { email: "john@example.com" },
+    },
+    {
+      id: 2,
+      reference: "ORD-TEST-002",
+      amountCents: 7990,
+      status: "paid",
+      user: { email: "jane@example.com" },
+    },
+  ]);
+
+  render(await Page());
+
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select order ORD-TEST-001",
+    }),
+  );
+
+  expect(screen.getByText("1 order selected")).toBeInTheDocument();
+
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select order ORD-TEST-002",
+    }),
+  );
+
+  expect(screen.getByText("2 orders selected")).toBeInTheDocument();
+});
+
+test("selects all visible orders", async () => {
+  mockFindMany.mockResolvedValue([
+    {
+      id: 1,
+      reference: "ORD-TEST-001",
+      amountCents: 4990,
+      status: "pending",
+      user: { email: "john@example.com" },
+    },
+    {
+      id: 2,
+      reference: "ORD-TEST-002",
+      amountCents: 7990,
+      status: "paid",
+      user: { email: "jane@example.com" },
+    },
+  ]);
+
+  render(await Page());
+
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Select all visible orders",
+    }),
+  );
+
+  expect(
+    screen.getByRole("checkbox", {
+      name: "Select order ORD-TEST-001",
+    }),
+  ).toBeChecked();
+
+  expect(
+    screen.getByRole("checkbox", {
+      name: "Select order ORD-TEST-002",
+    }),
+  ).toBeChecked();
+
+  expect(screen.getByText("2 orders selected")).toBeInTheDocument();
+});
