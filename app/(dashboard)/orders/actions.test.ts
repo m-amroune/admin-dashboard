@@ -17,7 +17,7 @@ jest.mock("next/navigation", () => ({
 
 const mockUpdateMany = prisma.order.updateMany as jest.Mock;
 const mockDeleteMany = prisma.order.deleteMany as jest.Mock;
-const mockRedirect = redirect as jest.Mock;
+const mockRedirect = redirect as unknown as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
