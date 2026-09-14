@@ -116,6 +116,7 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
               <option value="pending">Pending</option>
               <option value="paid">Paid</option>
               <option value="shipped">Shipped</option>
+              <option value="cancelled">Cancelled</option>
             </select>
 
             <button
@@ -125,6 +126,13 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
               Update
             </button>
           </form>
+
+          <Link
+            href={`/orders/${order.id}`}
+            className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+          >
+            View details
+          </Link>
 
           <form
             action={deleteOrder}
@@ -205,6 +213,7 @@ export default function OrdersTable({ data }: { data: OrderRow[] }) {
             <option value="pending">Pending</option>
             <option value="paid">Paid</option>
             <option value="shipped">Shipped</option>
+            <option value="cancelled">Cancelled</option>
           </select>
         </div>
 
@@ -307,7 +316,7 @@ export default function OrdersTable({ data }: { data: OrderRow[] }) {
           </div>
         )}
         {/* Table header */}
-        <div className="hidden border-b border-slate-200 bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-600 lg:grid lg:grid-cols-[32px_140px_110px_220px_auto] lg:items-center lg:gap-4">
+        <div className="hidden border-b border-slate-200 bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-600 lg:grid lg:grid-cols-[32px_120px_100px_180px_minmax(0,1fr)] lg:items-center lg:gap-4">
           <input
             type="checkbox"
             checked={table.getIsAllPageRowsSelected()}
@@ -324,7 +333,7 @@ export default function OrdersTable({ data }: { data: OrderRow[] }) {
         {table.getRowModel().rows.map((row) => (
           <div
             key={row.id}
-            className="grid gap-4 border-b border-slate-200 px-5 py-4 text-base last:border-b-0 lg:grid-cols-[32px_140px_110px_220px_auto] lg:items-center"
+            className="grid gap-4 border-b border-slate-200 px-5 py-4 text-base last:border-b-0 lg:grid-cols-[32px_120px_100px_180px_minmax(0,1fr)] lg:items-center"
           >
             {/* Row selection */}
             <input

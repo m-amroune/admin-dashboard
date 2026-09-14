@@ -157,9 +157,9 @@ test("sorts orders by email", async () => {
 
   fireEvent.click(screen.getByRole("button", { name: "Email" }));
 
-  const orderLinks = screen
-    .getAllByRole("link")
-    .filter((link) => link.getAttribute("href")?.startsWith("/orders/"));
+  const orderLinks = screen.getAllByRole("link", {
+  name: /@example\.com/,
+});
 
   expect(orderLinks.map((link) => link.textContent)).toEqual([
     "alice@example.com",
