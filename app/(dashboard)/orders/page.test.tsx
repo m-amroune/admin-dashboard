@@ -1,11 +1,14 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+
 import { prisma } from "@/lib/prisma";
+
 import Page from "./page";
 
 jest.mock("@/lib/prisma", () => ({
   prisma: {
     order: {
       findMany: jest.fn(),
+      count: jest.fn(),
     },
     user: {
       findMany: jest.fn(),
@@ -13,15 +16,43 @@ jest.mock("@/lib/prisma", () => ({
   },
 }));
 
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({
+    replace: jest.fn(),
+  }),
+  usePathname: () => "/orders",
+  useSearchParams: () => new URLSearchParams(),
+  redirect: jest.fn(),
+}));
+
 const mockFindMany = prisma.order.findMany as jest.Mock;
+const mockCount = prisma.order.count as jest.Mock;
 const mockUserFindMany = prisma.user.findMany as jest.Mock;
 
+type TestSearchParams = {
+  search?: string;
+  status?: string;
+  sort?: string;
+  order?: string;
+  page?: string;
+};
+
+const renderPage = async (searchParams: TestSearchParams = {}) => {
+  render(
+    await Page({
+      searchParams: Promise.resolve(searchParams),
+    }),
+  );
+};
+
 beforeEach(() => {
+  jest.clearAllMocks();
+
+  mockCount.mockResolvedValue(2);
+
   mockUserFindMany.mockResolvedValue([
     {
       id: 1,
-      reference: "ORD-TEST-001",
-      amountCents: 4990,
       email: "john@example.com",
       name: "John Doe",
     },
@@ -32,17 +63,21 @@ test("displays orders from the database", async () => {
   mockFindMany.mockResolvedValue([
     {
       id: 1,
+      reference: "ORD-TEST-001",
+      amountCents: 4990,
       status: "pending",
       user: { email: "john@example.com" },
     },
     {
       id: 2,
+      reference: "ORD-TEST-002",
+      amountCents: 7990,
       status: "paid",
       user: { email: "jane@example.com" },
     },
   ]);
 
-  render(await Page());
+  await renderPage();
 
   expect(screen.getByText("john@example.com")).toBeInTheDocument();
   expect(screen.getByText("jane@example.com")).toBeInTheDocument();
@@ -52,12 +87,14 @@ test("displays the current order status", async () => {
   mockFindMany.mockResolvedValue([
     {
       id: 1,
+      reference: "ORD-TEST-001",
+      amountCents: 4990,
       status: "pending",
       user: { email: "john@example.com" },
     },
   ]);
 
-  render(await Page());
+  await renderPage();
 
   expect(screen.getByRole("combobox", { name: "Order status" })).toHaveValue(
     "pending",
@@ -68,12 +105,14 @@ test("displays the order detail link", async () => {
   mockFindMany.mockResolvedValue([
     {
       id: 1,
+      reference: "ORD-TEST-001",
+      amountCents: 4990,
       status: "pending",
       user: { email: "john@example.com" },
     },
   ]);
 
-  render(await Page());
+  await renderPage();
 
   expect(
     screen.getByRole("link", { name: "john@example.com" }),
@@ -83,109 +122,75 @@ test("displays the order detail link", async () => {
 test("displays the empty state when there are no orders", async () => {
   mockFindMany.mockResolvedValue([]);
 
-  render(await Page());
+  await renderPage();
 
   expect(screen.getByText("No orders found.")).toBeInTheDocument();
 });
 
 test("filters orders by email", async () => {
-  mockFindMany.mockResolvedValue([
-    {
-      id: 1,
-      status: "pending",
-      user: { email: "john@example.com" },
-    },
-    {
-      id: 2,
-      status: "paid",
-      user: { email: "jane@example.com" },
-    },
-  ]);
+  mockFindMany.mockResolvedValue([]);
 
-  render(await Page());
+  await renderPage({ search: "jane" });
 
-  fireEvent.change(
-    screen.getByRole("searchbox", { name: "Search orders by email" }),
-    {
-      target: { value: "jane" },
-    },
+  expect(mockFindMany).toHaveBeenCalledWith(
+    expect.objectContaining({
+      where: expect.objectContaining({
+        user: {
+          email: {
+            contains: "jane",
+            mode: "insensitive",
+          },
+        },
+      }),
+    }),
   );
-
-  expect(screen.getByText("jane@example.com")).toBeInTheDocument();
-  expect(screen.queryByText("john@example.com")).not.toBeInTheDocument();
 });
 
 test("filters orders by status", async () => {
-  mockFindMany.mockResolvedValue([
-    {
-      id: 1,
-      status: "pending",
-      user: { email: "john@example.com" },
-    },
-    {
-      id: 2,
-      status: "paid",
-      user: { email: "jane@example.com" },
-    },
-  ]);
+  mockFindMany.mockResolvedValue([]);
 
-  render(await Page());
+  await renderPage({ status: "paid" });
 
-  fireEvent.change(screen.getByLabelText("Filter orders by status"), {
-    target: { value: "paid" },
-  });
-
-  expect(screen.getByText("jane@example.com")).toBeInTheDocument();
-  expect(screen.queryByText("john@example.com")).not.toBeInTheDocument();
+  expect(mockFindMany).toHaveBeenCalledWith(
+    expect.objectContaining({
+      where: expect.objectContaining({
+        status: "paid",
+      }),
+    }),
+  );
 });
 
 test("sorts orders by email", async () => {
-  mockFindMany.mockResolvedValue([
-    {
-      id: 1,
-      status: "pending",
-      user: { email: "zoe@example.com" },
-    },
-    {
-      id: 2,
-      status: "paid",
-      user: { email: "alice@example.com" },
-    },
-  ]);
+  mockFindMany.mockResolvedValue([]);
 
-  render(await Page());
+  await renderPage({
+    sort: "email",
+    order: "desc",
+  });
 
-  fireEvent.click(screen.getByRole("button", { name: "Email" }));
-
-  const orderLinks = screen.getAllByRole("link", {
-  name: /@example\.com/,
-});
-
-  expect(orderLinks.map((link) => link.textContent)).toEqual([
-    "alice@example.com",
-    "zoe@example.com",
-  ]);
+  expect(mockFindMany).toHaveBeenCalledWith(
+    expect.objectContaining({
+      orderBy: {
+        user: {
+          email: "desc",
+        },
+      },
+    }),
+  );
 });
 
 test("paginates orders", async () => {
-  mockFindMany.mockResolvedValue(
-    Array.from({ length: 6 }, (_, index) => ({
-      id: index + 1,
-      status: "pending",
-      user: { email: `user${index + 1}@example.com` },
-    })),
+  mockCount.mockResolvedValue(6);
+  mockFindMany.mockResolvedValue([]);
+
+  await renderPage({ page: "2" });
+
+  expect(mockFindMany).toHaveBeenCalledWith(
+    expect.objectContaining({
+      skip: 5,
+      take: 5,
+    }),
   );
-
-  render(await Page());
-
-  expect(screen.getByText("user1@example.com")).toBeInTheDocument();
-  expect(screen.getByText("user5@example.com")).toBeInTheDocument();
-  expect(screen.queryByText("user6@example.com")).not.toBeInTheDocument();
-
-  fireEvent.click(screen.getByRole("button", { name: "Next" }));
-
-  expect(screen.getByText("user6@example.com")).toBeInTheDocument();
-  expect(screen.queryByText("user1@example.com")).not.toBeInTheDocument();
 });
 
 test("displays order reference and amount", async () => {
@@ -199,7 +204,7 @@ test("displays order reference and amount", async () => {
     },
   ]);
 
-  render(await Page());
+  await renderPage();
 
   expect(screen.getByText("ORD-TEST-001")).toBeInTheDocument();
   expect(screen.getByText("$49.90")).toBeInTheDocument();
@@ -223,7 +228,7 @@ test("selects an order and displays the selected count", async () => {
     },
   ]);
 
-  render(await Page());
+  await renderPage();
 
   fireEvent.click(
     screen.getByRole("checkbox", {
@@ -260,7 +265,7 @@ test("selects all visible orders", async () => {
     },
   ]);
 
-  render(await Page());
+  await renderPage();
 
   fireEvent.click(
     screen.getByRole("checkbox", {

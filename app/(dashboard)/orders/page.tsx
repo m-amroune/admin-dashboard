@@ -2,19 +2,56 @@ import { prisma } from "@/lib/prisma";
 import OrdersTable from "./OrdersTable";
 import { createOrder } from "./actions";
 export const dynamic = "force-dynamic";
+import { redirect } from "next/navigation";
 
 // Displays the list of orders and allows status updates
-export default async function Page() {
-  const [orders, users] = await Promise.all([
+type OrdersPageProps = {
+  searchParams: Promise<{
+    search?: string;
+    status?: string;
+    sort?: string;
+    order?: string;
+    page?: string;
+  }>;
+};
+
+export default async function Page({ searchParams }: OrdersPageProps) {
+  const params = await searchParams;
+
+  const search = params.search?.trim() ?? "";
+  const status = params.status ?? "";
+  const sort = params.sort ?? "email";
+  const direction: "asc" | "desc" = params.order === "desc" ? "desc" : "asc";
+
+  const page = Math.max(Number(params.page) || 1, 1);
+  const pageSize = 5;
+  const skip = (page - 1) * pageSize;
+
+  const validStatuses = ["pending", "paid", "shipped", "cancelled"];
+
+  const [orders, users, totalOrders] = await Promise.all([
     prisma.order.findMany({
-      orderBy: { id: "asc" },
+      skip,
+      take: pageSize,
+      where: {
+        ...(search
+          ? {
+              user: {
+                email: {
+                  contains: search,
+                  mode: "insensitive",
+                },
+              },
+            }
+          : {}),
+        ...(validStatuses.includes(status) ? { status } : {}),
+      },
+      orderBy:
+        sort === "status"
+          ? { status: direction }
+          : { user: { email: direction } },
       include: {
         user: true,
-        statusHistory: {
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
       },
     }),
     prisma.user.findMany({
@@ -25,8 +62,46 @@ export default async function Page() {
         name: true,
       },
     }),
+    prisma.order.count({
+      where: {
+        ...(search
+          ? {
+              user: {
+                email: {
+                  contains: search,
+                  mode: "insensitive",
+                },
+              },
+            }
+          : {}),
+        ...(validStatuses.includes(status) ? { status } : {}),
+      },
+    }),
   ]);
+  const totalPages = Math.max(Math.ceil(totalOrders / pageSize), 1);
+  if (page > totalPages) {
+  const query = new URLSearchParams();
 
+  if (search) {
+    query.set("search", search);
+  }
+
+  if (validStatuses.includes(status)) {
+    query.set("status", status);
+  }
+
+  if (sort === "status") {
+    query.set("sort", "status");
+  }
+
+  if (direction === "desc") {
+    query.set("order", "desc");
+  }
+
+  const queryString = query.toString();
+
+  redirect(queryString ? `/orders?${queryString}` : "/orders");
+}
   const orderRows = orders.map((order) => ({
     id: order.id,
     reference: order.reference,
@@ -100,7 +175,7 @@ export default async function Page() {
             </button>
           </div>
         </form>
-        <OrdersTable data={orderRows} />
+        <OrdersTable data={orderRows} page={page} totalPages={totalPages} />
       </div>
     </div>
   );
