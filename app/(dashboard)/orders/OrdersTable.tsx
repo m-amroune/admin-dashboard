@@ -24,6 +24,8 @@ import {
   updateOrdersStatus,
 } from "./actions";
 
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 export type OrderRow = {
   id: number;
   reference: string;
@@ -157,25 +159,73 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
   },
 ];
 
-export default function OrdersTable({ data }: { data: OrderRow[] }) {
+type OrdersTableProps = {
+  data: OrderRow[];
+  page: number;
+  totalPages: number;
+};
+
+export default function OrdersTable({
+  data,
+  page,
+  totalPages,
+}: OrdersTableProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const updateQuery = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+
+    params.delete("page");
+
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  const currentSort = searchParams.get("sort") ?? "email";
+  const currentOrder = searchParams.get("order") === "desc" ? "desc" : "asc";
+
+  const updateSort = (sort: "email" | "status") => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    const nextOrder =
+      currentSort === sort && currentOrder === "asc" ? "desc" : "asc";
+
+    params.set("sort", sort);
+    params.set("order", nextOrder);
+    params.delete("page");
+
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  const goToPage = (nextPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (nextPage <= 1) {
+      params.delete("page");
+    } else {
+      params.set("page", String(nextPage));
+    }
+
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
   const table = useTable(
     {
       features,
       columns,
       data,
       getRowId: (row) => String(row.id),
-      initialState: {
-        pagination: {
-          pageIndex: 0,
-          pageSize: 5,
-        },
-      },
     },
     (state) => state,
   );
 
-  const emailColumn = table.getColumn("email");
-  const statusColumn = table.getColumn("status");
   const selectedCount = table.getSelectedRowModel().rows.length;
   const selectedOrderIds = table
     .getSelectedRowModel()
@@ -192,20 +242,16 @@ export default function OrdersTable({ data }: { data: OrderRow[] }) {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <input
             type="search"
-            value={(emailColumn?.getFilterValue() ?? "") as string}
-            onChange={(event) =>
-              emailColumn?.setFilterValue(event.target.value)
-            }
+            value={searchParams.get("search") ?? ""}
+            onChange={(event) => updateQuery("search", event.target.value)}
             placeholder="Search by email..."
             aria-label="Search orders by email"
             className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-base text-slate-700 outline-none transition focus:border-blue-500 sm:w-64"
           />
 
           <select
-            value={(statusColumn?.getFilterValue() ?? "") as string}
-            onChange={(event) =>
-              statusColumn?.setFilterValue(event.target.value || undefined)
-            }
+            value={searchParams.get("status") ?? ""}
+            onChange={(event) => updateQuery("status", event.target.value)}
             aria-label="Filter orders by status"
             className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-base text-slate-700 outline-none transition focus:border-blue-500"
           >
@@ -225,30 +271,30 @@ export default function OrdersTable({ data }: { data: OrderRow[] }) {
 
           <button
             type="button"
-            onClick={emailColumn?.getToggleSortingHandler()}
+            onClick={() => updateSort("status")}
             className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition ${
-              emailColumn?.getIsSorted()
-                ? "bg-blue-600 text-white shadow-sm hover:bg-blue-500"
-                : "border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200"
-            }`}
-          >
-            Email
-            {emailColumn?.getIsSorted() === "asc" && " ↑"}
-            {emailColumn?.getIsSorted() === "desc" && " ↓"}
-          </button>
-
-          <button
-            type="button"
-            onClick={statusColumn?.getToggleSortingHandler()}
-            className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition ${
-              statusColumn?.getIsSorted()
+              currentSort === "status"
                 ? "bg-blue-600 text-white shadow-sm hover:bg-blue-500"
                 : "border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200"
             }`}
           >
             Status
-            {statusColumn?.getIsSorted() === "asc" && " ↑"}
-            {statusColumn?.getIsSorted() === "desc" && " ↓"}
+            {currentSort === "status" && currentOrder === "asc" && " ↑"}
+            {currentSort === "status" && currentOrder === "desc" && " ↓"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => updateSort("status")}
+            className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition ${
+              currentSort === "status"
+                ? "bg-blue-600 text-white shadow-sm hover:bg-blue-500"
+                : "border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200"
+            }`}
+          >
+            Status
+            {currentSort === "status" && currentOrder === "asc" && " ↑"}
+            {currentSort === "status" && currentOrder === "desc" && " ↓"}
           </button>
         </div>
       </div>
@@ -359,21 +405,21 @@ export default function OrdersTable({ data }: { data: OrderRow[] }) {
       <div className="mt-4 flex items-center gap-3">
         <button
           type="button"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          onClick={() => goToPage(page - 1)}
+          disabled={page <= 1}
           className="cursor-pointer rounded-lg border border-slate-200 bg-white px-4 py-2 text-base font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Previous
         </button>
 
         <span className="text-base text-slate-600">
-          Page {table.state.pagination.pageIndex + 1} of {table.getPageCount()}
+          Page {page} of {totalPages}
         </span>
 
         <button
           type="button"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
+          onClick={() => goToPage(page + 1)}
+          disabled={page >= totalPages}
           className="cursor-pointer rounded-lg border border-slate-200 bg-white px-4 py-2 text-base font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Next

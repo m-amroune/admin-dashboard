@@ -9,11 +9,10 @@ import {
   createFilteredRowModel,
   filterFn_includesString,
   filterFn_equalsString,
-  createPaginatedRowModel,
-  rowPaginationFeature,
   type ColumnDef,
 } from "@tanstack/react-table";
 import { deleteUser, toggleRole } from "./actions";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export type UserRow = {
   id: number;
@@ -25,10 +24,9 @@ export type UserRow = {
 const features = tableFeatures({
   columnFilteringFeature,
   rowSortingFeature,
-  rowPaginationFeature,
   filteredRowModel: createFilteredRowModel(),
   sortedRowModel: createSortedRowModel(),
-  paginatedRowModel: createPaginatedRowModel(),
+  
   filterFns: {
     includesString: filterFn_includesString,
     equalsString: filterFn_equalsString,
@@ -55,25 +53,74 @@ const columns: Array<ColumnDef<typeof features, UserRow>> = [
   },
 ];
 
-export default function UsersTable({ data }: { data: UserRow[] }) {
-  const table = useTable(
-    {
-      features,
-      columns,
-      data,
-      initialState: {
-        pagination: {
-          pageIndex: 0,
-          pageSize: 5,
-        },
-      },
-    },
-    (state) => state,
-  );
+type UsersTableProps = {
+  data: UserRow[];
+  page: number;
+  totalPages: number;
+};
 
-  const emailColumn = table.getColumn("email");
-  const roleColumn = table.getColumn("role");
-  const searchColumn = table.getColumn("search");
+export default function UsersTable({
+  data,
+  page,
+  totalPages,
+}: UsersTableProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const updateQuery = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+
+    params.delete("page");
+
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  const sortParam = searchParams.get("sort");
+
+  const currentSort =
+    sortParam === "email" || sortParam === "role" ? sortParam : null;
+
+  const currentOrder = searchParams.get("order") === "desc" ? "desc" : "asc";
+
+  const updateSort = (sort: "email" | "role") => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    const nextOrder =
+      currentSort === sort && currentOrder === "asc" ? "desc" : "asc";
+
+    params.set("sort", sort);
+    params.set("order", nextOrder);
+    params.delete("page");
+
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+  const goToPage = (nextPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (nextPage <= 1) {
+      params.delete("page");
+    } else {
+      params.set("page", String(nextPage));
+    }
+
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+  const table = useTable(
+  {
+    features,
+    columns,
+    data,
+  },
+  (state) => state,
+);
+
   if (data.length === 0) {
     return <p className="mb-4 text-sm text-gray-500">No users found.</p>;
   }
@@ -86,20 +133,16 @@ export default function UsersTable({ data }: { data: UserRow[] }) {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <input
             type="search"
-            value={(searchColumn?.getFilterValue() ?? "") as string}
-            onChange={(event) =>
-              searchColumn?.setFilterValue(event.target.value)
-            }
+            value={searchParams.get("search") ?? ""}
+            onChange={(event) => updateQuery("search", event.target.value)}
             placeholder="Search by name or email..."
             aria-label="Search users by name or email"
             className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-base text-slate-700 outline-none transition focus:border-blue-500 sm:w-72"
           />
 
           <select
-            value={(roleColumn?.getFilterValue() ?? "") as string}
-            onChange={(event) =>
-              roleColumn?.setFilterValue(event.target.value || undefined)
-            }
+            value={searchParams.get("role") ?? ""}
+            onChange={(event) => updateQuery("role", event.target.value)}
             aria-label="Filter users by role"
             className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-base text-slate-700 outline-none transition focus:border-blue-500"
           >
@@ -117,30 +160,30 @@ export default function UsersTable({ data }: { data: UserRow[] }) {
 
           <button
             type="button"
-            onClick={emailColumn?.getToggleSortingHandler()}
-            className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition ${
-              emailColumn?.getIsSorted()
-                ? "bg-blue-600 text-white shadow-sm hover:bg-blue-500"
-                : "border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200"
+            onClick={() => updateSort("email")}
+            className={`cursor-pointer rounded-lg border px-4 py-2 text-sm font-medium transition ${
+              currentSort === "email"
+                ? "border-[#315C72] bg-[#315C72] text-white shadow-sm hover:bg-[#284D60]"
+                : "border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200"
             }`}
           >
             Email
-            {emailColumn?.getIsSorted() === "asc" && " ↑"}
-            {emailColumn?.getIsSorted() === "desc" && " ↓"}
+            {currentSort === "email" && currentOrder === "asc" && " ↑"}
+            {currentSort === "email" && currentOrder === "desc" && " ↓"}
           </button>
 
           <button
             type="button"
-            onClick={roleColumn?.getToggleSortingHandler()}
-            className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition ${
-              roleColumn?.getIsSorted()
-                ? "bg-blue-600 text-white shadow-sm hover:bg-blue-500"
-                : "border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200"
+            onClick={() => updateSort("role")}
+            className={`cursor-pointer rounded-lg border px-4 py-2 text-sm font-medium transition ${
+              currentSort === "role"
+                ? "border-[#315C72] bg-[#315C72] text-white shadow-sm hover:bg-[#284D60]"
+                : "border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200"
             }`}
           >
             Role
-            {roleColumn?.getIsSorted() === "asc" && " ↑"}
-            {roleColumn?.getIsSorted() === "desc" && " ↓"}
+            {currentSort === "role" && currentOrder === "asc" && " ↑"}
+            {currentSort === "role" && currentOrder === "desc" && " ↓"}
           </button>
         </div>
       </div>
@@ -207,24 +250,25 @@ export default function UsersTable({ data }: { data: UserRow[] }) {
         })}
       </div>
 
+      {/* Pagination */}
       <div className="mt-4 flex items-center gap-3">
         <button
           type="button"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          onClick={() => goToPage(page - 1)}
+          disabled={page <= 1}
           className="cursor-pointer rounded-lg border border-slate-200 bg-white px-4 py-2 text-base font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Previous
         </button>
 
         <span className="text-base text-slate-600">
-          Page {table.state.pagination.pageIndex + 1} of {table.getPageCount()}
+          Page {page} of {totalPages}
         </span>
 
         <button
           type="button"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
+          onClick={() => goToPage(page + 1)}
+          disabled={page >= totalPages}
           className="cursor-pointer rounded-lg border border-slate-200 bg-white px-4 py-2 text-base font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Next

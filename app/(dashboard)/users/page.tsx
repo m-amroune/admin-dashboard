@@ -30,12 +30,83 @@ export default async function Page({
 }) {
   // Fetch all users from the database
   const params = await Promise.resolve(searchParams ?? {});
+  const search = params.search?.trim() ?? "";
+  const role = params.role ?? "";
+  const sort = params.sort ?? "";
+  const direction: "asc" | "desc" = params.order === "desc" ? "desc" : "asc";
+
+  const page = Math.max(Number(params.page) || 1, 1);
+  const pageSize = 5;
+  const skip = (page - 1) * pageSize;
   const hasOrdersError = params["error"] === "user_has_orders";
   const isCreated = params["created"] === "1";
 
-  const users = await prisma.user.findMany({
-    orderBy: { id: "asc" },
-  });
+  const validRoles = ["user", "admin"];
+
+  const where = {
+    ...(search
+      ? {
+          OR: [
+            {
+              email: {
+                contains: search,
+                mode: "insensitive" as const,
+              },
+            },
+            {
+              name: {
+                contains: search,
+                mode: "insensitive" as const,
+              },
+            },
+          ],
+        }
+      : {}),
+    ...(validRoles.includes(role) ? { role } : {}),
+  };
+
+  const [users, totalUsers] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      skip,
+      take: pageSize,
+      orderBy:
+  sort === "role"
+    ? { role: direction }
+    : sort === "email"
+      ? { email: direction }
+      : { id: "asc" },
+    }),
+
+    prisma.user.count({
+      where,
+    }),
+  ]);
+
+  const totalPages = Math.max(Math.ceil(totalUsers / pageSize), 1);
+  if (page > totalPages) {
+  const query = new URLSearchParams();
+
+  if (search) {
+    query.set("search", search);
+  }
+
+  if (validRoles.includes(role)) {
+    query.set("role", role);
+  }
+
+  if (sort === "email" || sort === "role") {
+    query.set("sort", sort);
+  }
+
+  if (direction === "desc") {
+    query.set("order", "desc");
+  }
+
+  const queryString = query.toString();
+
+  redirect(queryString ? `/users?${queryString}` : "/users");
+}
 
   return (
     <div className="max-w-3xl">
@@ -88,6 +159,8 @@ export default async function Page({
           email: user.email,
           role: user.role,
         }))}
+         page={page}
+  totalPages={totalPages}
       />
     </div>
   );
