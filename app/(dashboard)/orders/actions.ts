@@ -4,21 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { randomUUID } from "crypto";
 
-export async function updateOrderStatus(formData: FormData) {
-  const id = Number(formData.get("id"));
-  const status = String(formData.get("status"));
-
-  if (!["pending", "paid", "shipped"].includes(status)) {
-    return;
-  }
-
-  await prisma.order.update({
-    where: { id },
-    data: { status },
-  });
-
-  redirect("/orders");
-}
 
 export async function createOrder(formData: FormData) {
   const userId = Number(formData.get("userId"));
@@ -37,18 +22,23 @@ export async function createOrder(formData: FormData) {
     return;
   }
 
-  if (!["pending", "paid", "shipped"].includes(status)) {
-    return;
-  }
+  if (!["pending", "paid", "shipped", "cancelled"].includes(status)) {
+  return;
+}
 
-  await prisma.order.create({
-    data: {
-      userId,
-      status,
-      reference,
-      amountCents,
+ await prisma.order.create({
+  data: {
+    userId,
+    status,
+    reference,
+    amountCents,
+    statusHistory: {
+      create: {
+        status,
+      },
     },
-  });
+  },
+});
 
   redirect("/orders");
 }
@@ -67,8 +57,58 @@ export async function deleteOrder(formData: FormData) {
   redirect("/orders");
 }
 
+export async function updateOrderStatus(formData: FormData) {
+  const id = Number(formData.get("id"));
+  const status = String(formData.get("status"));
+
+  if (!Number.isInteger(id)) {
+    return;
+  }
+
+  if (!["pending", "paid", "shipped", "cancelled"].includes(status)) {
+    return;
+  }
+
+  const order = await prisma.order.findUnique({
+    where: { id },
+    select: { status: true },
+  });
+
+  if (!order || order.status === status) {
+    redirect("/orders");
+  }
+
+  const allowedTransitions: Record<string, string[]> = {
+    pending: ["paid", "cancelled"],
+    paid: ["shipped", "cancelled"],
+    shipped: [],
+    cancelled: [],
+  };
+
+  if (!allowedTransitions[order.status]?.includes(status)) {
+    redirect("/orders");
+  }
+
+  await prisma.order.update({
+    where: { id },
+    data: {
+      status,
+      statusHistory: {
+        create: {
+          status,
+        },
+      },
+    },
+  });
+
+  redirect("/orders");
+}
+
 export async function updateOrdersStatus(formData: FormData) {
-  const ids = formData.getAll("ids").map(Number).filter(Number.isInteger);
+  const ids = formData
+    .getAll("ids")
+    .map(Number)
+    .filter(Number.isInteger);
 
   const status = String(formData.get("status"));
 
@@ -80,16 +120,50 @@ export async function updateOrdersStatus(formData: FormData) {
     return;
   }
 
-  await prisma.order.updateMany({
+  const orders = await prisma.order.findMany({
     where: {
       id: {
         in: ids,
       },
     },
-    data: {
-      status,
+    select: {
+      id: true,
+      status: true,
     },
   });
+
+  const requiredCurrentStatus: Record<string, string> = {
+    paid: "pending",
+    shipped: "paid",
+  };
+
+  const changedIds = orders
+    .filter((order) => order.status === requiredCurrentStatus[status])
+    .map((order) => order.id);
+
+  if (changedIds.length === 0) {
+    redirect("/orders");
+  }
+
+  await prisma.$transaction([
+    prisma.order.updateMany({
+      where: {
+        id: {
+          in: changedIds,
+        },
+      },
+      data: {
+        status,
+      },
+    }),
+
+    prisma.orderStatusHistory.createMany({
+      data: changedIds.map((orderId) => ({
+        orderId,
+        status,
+      })),
+    }),
+  ]);
 
   redirect("/orders");
 }

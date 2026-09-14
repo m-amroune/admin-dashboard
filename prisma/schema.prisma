@@ -27,6 +27,16 @@ model Order {
   updatedAt   DateTime @default(now()) @updatedAt
   userId      Int
   user        User     @relation(fields: [userId], references: [id], onDelete: Restrict)
-
+  statusHistory OrderStatusHistory[]
   @@index([userId])
+}
+
+model OrderStatusHistory {
+  id        Int      @id @default(autoincrement())
+  status    String
+  createdAt DateTime @default(now())
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
 }

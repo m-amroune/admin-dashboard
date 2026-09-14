@@ -57,15 +57,20 @@ const orders = [
 
 for (const order of orders) {
   await prisma.order.create({
-    data: {
-      reference: order.reference,
-      amountCents: order.amountCents,
-      status: order.status,
-      user: {
-        connect: { email: order.email },
+  data: {
+    reference: order.reference,
+    amountCents: order.amountCents,
+    status: order.status,
+    user: {
+      connect: { email: order.email },
+    },
+    statusHistory: {
+      create: {
+        status: order.status,
       },
     },
-  });
+  },
+});
 }
 
 

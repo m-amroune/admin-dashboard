@@ -1,13 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { deleteOrders, updateOrdersStatus } from "./actions";
-
 jest.mock("@/lib/prisma", () => ({
   prisma: {
     order: {
+      findMany: jest.fn(),
       updateMany: jest.fn(),
       deleteMany: jest.fn(),
     },
+    orderStatusHistory: {
+      createMany: jest.fn(),
+    },
+    $transaction: jest.fn(),
   },
 }));
 
@@ -15,8 +19,9 @@ jest.mock("next/navigation", () => ({
   redirect: jest.fn(),
 }));
 
-const mockUpdateMany = prisma.order.updateMany as jest.Mock;
-const mockDeleteMany = prisma.order.deleteMany as jest.Mock;
+const mockFindMany = prisma.order.findMany as unknown as jest.Mock;
+const mockUpdateMany = prisma.order.updateMany as unknown as jest.Mock;
+const mockDeleteMany = prisma.order.deleteMany as unknown as jest.Mock;
 const mockRedirect = redirect as unknown as jest.Mock;
 
 beforeEach(() => {
@@ -24,6 +29,10 @@ beforeEach(() => {
 });
 
 test("updates the status of selected orders", async () => {
+  mockFindMany.mockResolvedValue([
+  { id: 1, status: "pending" },
+  { id: 2, status: "pending" },
+]);
   const formData = new FormData();
 
   formData.append("ids", "1");
