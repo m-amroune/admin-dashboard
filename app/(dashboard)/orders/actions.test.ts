@@ -15,6 +15,16 @@ jest.mock("@/lib/prisma", () => ({
   },
 }));
 
+jest.mock("@/lib/require-auth", () => ({
+  requireAuth: jest.fn().mockResolvedValue({
+    user: {
+      id: "1",
+      email: "demo@admin-dashboard.dev",
+      name: "Demo Admin",
+    },
+  }),
+}));
+
 jest.mock("next/navigation", () => ({
   redirect: jest.fn(),
 }));
