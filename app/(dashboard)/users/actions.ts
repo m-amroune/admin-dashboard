@@ -1,9 +1,10 @@
 "use server";
-
+import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
 export async function deleteUser(formData: FormData) {
+  await requireAuth();
   const id = Number(formData.get("id"));
 
   const orderCount = await prisma.order.count({
@@ -22,6 +23,7 @@ export async function deleteUser(formData: FormData) {
 }
 
 export async function toggleRole(formData: FormData) {
+  await requireAuth();
   const id = Number(formData.get("id"));
   const currentRole = String(formData.get("role"));
 

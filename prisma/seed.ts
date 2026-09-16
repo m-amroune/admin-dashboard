@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client";
+import { hash } from "bcryptjs";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -20,6 +21,21 @@ async function main() {
       { email: "jack.doe@example.com", name: "Jack Doe", role: "user" },
     ],
   });
+
+const demoAdminPasswordHash = await hash("AdminDemo!2026#", 12);
+
+await prisma.adminAccount.upsert({
+  where: {
+    email: "demo@admin-dashboard.dev",
+  },
+  update: {
+    passwordHash: demoAdminPasswordHash,
+  },
+  create: {
+    email: "demo@admin-dashboard.dev",
+    passwordHash: demoAdminPasswordHash,
+  },
+});
 
 // Seed orders in a predictable chronological order
 const orders = [

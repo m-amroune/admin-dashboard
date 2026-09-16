@@ -16,6 +16,14 @@ jest.mock("@/lib/prisma", () => ({
   },
 }));
 
+jest.mock("./actions", () => ({
+  createOrder: jest.fn(),
+  deleteOrder: jest.fn(),
+  deleteOrders: jest.fn(),
+  updateOrderStatus: jest.fn(),
+  updateOrdersStatus: jest.fn(),
+}));
+
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
     replace: jest.fn(),

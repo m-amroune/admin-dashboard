@@ -1,11 +1,12 @@
 "use server";
-
+import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { randomUUID } from "crypto";
 
 
 export async function createOrder(formData: FormData) {
+  await requireAuth();
   const userId = Number(formData.get("userId"));
   const status = String(formData.get("status") || "pending");
 
@@ -44,6 +45,7 @@ export async function createOrder(formData: FormData) {
 }
 
 export async function deleteOrder(formData: FormData) {
+  await requireAuth();
   const id = Number(formData.get("id"));
 
   if (!Number.isInteger(id)) {
@@ -58,6 +60,7 @@ export async function deleteOrder(formData: FormData) {
 }
 
 export async function updateOrderStatus(formData: FormData) {
+  await requireAuth();
   const id = Number(formData.get("id"));
   const status = String(formData.get("status"));
 
@@ -105,6 +108,7 @@ export async function updateOrderStatus(formData: FormData) {
 }
 
 export async function updateOrdersStatus(formData: FormData) {
+  await requireAuth();
   const ids = formData
     .getAll("ids")
     .map(Number)
@@ -169,6 +173,7 @@ export async function updateOrdersStatus(formData: FormData) {
 }
 
 export async function deleteOrders(formData: FormData) {
+  await requireAuth();
   const ids = formData.getAll("ids").map(Number).filter(Number.isInteger);
 
   if (ids.length === 0) {

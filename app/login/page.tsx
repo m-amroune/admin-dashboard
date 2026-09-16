@@ -1,29 +1,16 @@
-import { cookies } from "next/headers";
+import { auth, signIn } from "@/auth";
 import { redirect } from "next/navigation";
 import { LoginButton } from "./LoginButton";
-import {
-  LayoutDashboard,
-  ShoppingBag,
-  UserRound,
-  Users,
-} from "lucide-react";
-/**
- * Server action handling a minimal login flow.
- * Sets a session cookie and redirects to the dashboard.
- */
-async function login() {
+import { LayoutDashboard, ShoppingBag, UserRound, Users } from "lucide-react";
+
+async function login(formData: FormData) {
   "use server";
 
-  const cookieStore = await cookies();
-
-  cookieStore.set("dh_session", "1", {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+  await signIn("credentials", {
+    email: formData.get("email"),
+    password: formData.get("password"),
+    redirectTo: "/dashboard",
   });
-
-  redirect("/dashboard");
 }
 
 export default function Page() {
@@ -48,22 +35,20 @@ export default function Page() {
             </div>
 
             <form action={login} className="space-y-6">
+              <input
+                type="hidden"
+                name="email"
+                value="demo@admin-dashboard.dev"
+              />
+
               <div>
-                <label
-                  htmlFor="username"
-                  className="mb-2 block text-sm font-medium text-slate-700"
-                >
-                  Username
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Account
                 </label>
 
-                <input
-                  id="username"
-                  type="text"
-                  name="username"
-                  defaultValue="admin"
-                  aria-label="Username"
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
-                />
+                <div className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-700">
+                  Admin
+                </div>
               </div>
 
               <div>
@@ -78,7 +63,8 @@ export default function Page() {
                   id="password"
                   type="password"
                   name="password"
-                  defaultValue="demo1234"
+                  autoComplete="current-password"
+                  defaultValue="AdminDemo!2026#"
                   aria-label="Password"
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
                 />
