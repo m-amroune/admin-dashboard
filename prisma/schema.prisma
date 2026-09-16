@@ -40,3 +40,11 @@ model OrderStatusHistory {
 
   @@index([orderId])
 }
+
+model AdminAccount {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+}

@@ -1,12 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import UsersTable from "./UsersTable";
+import { requireAuth } from "@/lib/require-auth";
 export const dynamic = "force-dynamic";
 
 // Server action called on form submit.
 // Creates a new user, then redirects.
 async function createUser(formData: FormData) {
   "use server";
+    await requireAuth();
   const email = String(formData.get("email") || "").trim();
   const name = String(formData.get("name") || "").trim();
 

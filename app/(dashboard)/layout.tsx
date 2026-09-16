@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
 import React from "react";
 import { SidebarNav } from "./SidebarNav";
@@ -8,16 +8,17 @@ import { UserRound } from "lucide-react";
 async function logout() {
   "use server";
 
-  const cookieStore = await cookies();
-  cookieStore.delete("dh_session");
-
-  redirect("/login");
+  await signOut({
+    redirectTo: "/login",
+  });
 }
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("dh_session");
-  if (!session) redirect("/login");
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/login");
+  }
 
   return (
     <div className="flex min-h-screen">
