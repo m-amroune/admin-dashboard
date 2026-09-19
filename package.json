@@ -8,7 +8,13 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "jest"
+    "test": "jest",
+    "test:e2e": "npm run db:e2e:reset && playwright test",
+    "db:e2e:seed:ci": "tsx prisma/seed-e2e.ts",
+    "db:e2e:seed": "dotenv -e .env.e2e -- tsx prisma/seed-e2e.ts",
+    "db:e2e:reset": "dotenv -e .env.e2e -- prisma migrate reset --force && npm run db:e2e:seed",
+    "test:e2e:ci": "playwright test"
+    
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -31,6 +37,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
@@ -39,6 +46,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "jest": "^29.7.0",
