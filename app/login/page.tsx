@@ -1,5 +1,4 @@
-import { auth, signIn } from "@/auth";
-import { redirect } from "next/navigation";
+import { signIn } from "@/auth";
 import { LoginButton } from "./LoginButton";
 import { LayoutDashboard, ShoppingBag, UserRound, Users } from "lucide-react";
 
@@ -119,7 +118,6 @@ export default function Page() {
                     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-50 text-blue-600">
                       <UserRound size={15} />
                     </div>
-
                     <span className="text-xs font-semibold text-slate-900">
                       Admin
                     </span>
@@ -131,52 +129,111 @@ export default function Page() {
                     Dashboard
                   </h2>
 
-                  <div className="mt-6 grid grid-cols-2 gap-3">
-                    <div className="rounded-xl border border-slate-200 border-t-4 border-t-blue-500 bg-white p-4 shadow-sm">
-                      <p className="text-xs font-medium text-slate-500">
+                  <div className="mt-5 grid grid-cols-3 gap-2">
+                    <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                      <p className="text-[10px] font-medium text-slate-500">
                         Users
                       </p>
-
-                      <p className="mt-2 text-2xl font-semibold text-slate-900">
-                        12
+                      <p className="mt-1 text-xl font-semibold text-slate-900">
+                        15
                       </p>
                     </div>
 
-                    <div className="rounded-xl border border-slate-200 border-t-4 border-t-green-500 bg-white p-4 shadow-sm">
-                      <p className="text-xs font-medium text-slate-500">
+                    <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                      <p className="text-[10px] font-medium text-slate-500">
                         Orders
                       </p>
+                      <p className="mt-1 text-xl font-semibold text-slate-900">
+                        28
+                      </p>
+                    </div>
 
-                      <p className="mt-2 text-2xl font-semibold text-slate-900">
-                        18
+                    <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                      <p className="text-[10px] font-medium text-slate-500">
+                        Sales
+                      </p>
+                      <p className="mt-1 text-lg font-semibold text-slate-900">
+                        $1.4K
                       </p>
                     </div>
                   </div>
 
-                  <div className="mt-4 rounded-xl border border-slate-200 border-t-4 border-t-amber-400 bg-white p-4 shadow-sm">
-                    <p className="text-xs font-semibold text-slate-700">
-                      Orders by status
-                    </p>
+                  <div className="mt-3 grid grid-cols-2 gap-3">
+                    <div className="rounded-xl border border-slate-200 border-t-4 border-t-amber-400 bg-white p-3 shadow-sm">
+                      <p className="text-[11px] font-semibold text-slate-700">
+                        Orders by status
+                      </p>
 
-                    <div className="mt-5 space-y-4 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-500">Pending</span>
-                        <span className="rounded-full bg-amber-50 px-2.5 py-1 font-medium text-amber-700">
-                          4
+                      <div className="mt-3 space-y-2 text-[10px]">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-500">Pending</span>
+                          <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-700">
+                            6
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-500">Paid</span>
+                          <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-700">
+                            8
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-500">Shipped</span>
+                          <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-700">
+                            9
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                      <p className="text-[11px] font-semibold text-slate-900">
+                        Order values
+                      </p>
+                      <p className="mt-0.5 text-[9px] text-slate-500">
+                        Latest 5 orders
+                      </p>
+
+                      <div className="mt-4 flex h-20 items-end gap-2 border-b border-slate-200 px-1">
+                        <div className="h-8 flex-1 rounded-t bg-blue-500/80" />
+                        <div className="h-12 flex-1 rounded-t bg-blue-500/80" />
+                        <div className="h-6 flex-1 rounded-t bg-blue-500/80" />
+                        <div className="h-16 flex-1 rounded-t bg-blue-500/80" />
+                        <div className="h-10 flex-1 rounded-t bg-blue-500/80" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[11px] font-semibold text-slate-900">
+                        Recent orders
+                      </p>
+                      <span className="text-[9px] text-slate-500">
+                        Latest 5
+                      </span>
+                    </div>
+
+                    <div className="mt-3 space-y-2 text-[9px]">
+                      <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2">
+                        <span className="truncate text-slate-700">
+                          ORD-2026-1028
+                        </span>
+                        <span className="text-slate-600">$76.00</span>
+                        <span className="rounded-full bg-blue-50 px-2 py-0.5 text-blue-700">
+                          Paid
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-500">Paid</span>
-                        <span className="rounded-full bg-blue-50 px-2.5 py-1 font-medium text-blue-700">
-                          8
+                      <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2">
+                        <span className="truncate text-slate-700">
+                          ORD-2026-1027
                         </span>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-500">Shipped</span>
-                        <span className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-700">
-                          6
+                        <span className="text-slate-600">$349.00</span>
+                        <span className="rounded-full bg-green-50 px-2 py-0.5 text-green-700">
+                          Shipped
                         </span>
                       </div>
                     </div>
