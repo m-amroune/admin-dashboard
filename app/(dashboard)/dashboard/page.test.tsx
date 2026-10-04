@@ -14,33 +14,24 @@ jest.mock("@/lib/prisma", () => ({
       count: jest.fn(),
     },
     order: {
-  count: jest.fn(),
-  groupBy: jest.fn(),
-  aggregate: jest.fn(),
-  findMany: jest.fn(),
-},
+      groupBy: jest.fn(),
+      findMany: jest.fn(),
+    },
   },
 }));
 
 const mockUserCount = prisma.user.count as jest.Mock;
-const mockOrderCount = prisma.order.count as jest.Mock;
 const mockOrderGroupBy = prisma.order.groupBy as jest.Mock;
-const mockOrderAggregate = prisma.order.aggregate as jest.Mock;
 const mockOrderFindMany = prisma.order.findMany as jest.Mock;
 
-// Default mocks required by the Dashboard
 beforeEach(() => {
-  mockOrderAggregate.mockResolvedValue({
-    _sum: { amountCents: 0 },
-  });
-
+  mockUserCount.mockResolvedValue(0);
+  mockOrderGroupBy.mockResolvedValue([]);
   mockOrderFindMany.mockResolvedValue([]);
 });
 
 test("displays the users count", async () => {
   mockUserCount.mockResolvedValue(5);
-  mockOrderCount.mockResolvedValue(8);
-  mockOrderGroupBy.mockResolvedValue([]);
 
   render(await Page());
 
@@ -48,9 +39,23 @@ test("displays the users count", async () => {
 });
 
 test("displays the orders count", async () => {
-  mockUserCount.mockResolvedValue(5);
-  mockOrderCount.mockResolvedValue(8);
-  mockOrderGroupBy.mockResolvedValue([]);
+  mockOrderGroupBy.mockResolvedValue([
+    {
+      status: "pending",
+      _count: { status: 3 },
+      _sum: { amountCents: 1000 },
+    },
+    {
+      status: "paid",
+      _count: { status: 4 },
+      _sum: { amountCents: 20580 },
+    },
+    {
+      status: "shipped",
+      _count: { status: 1 },
+      _sum: { amountCents: 3490 },
+    },
+  ]);
 
   render(await Page());
 
@@ -58,12 +63,22 @@ test("displays the orders count", async () => {
 });
 
 test("displays the orders status breakdown", async () => {
-  mockUserCount.mockResolvedValue(5);
-  mockOrderCount.mockResolvedValue(8);
   mockOrderGroupBy.mockResolvedValue([
-    { status: "pending", _count: { status: 3 } },
-    { status: "paid", _count: { status: 4 } },
-    { status: "shipped", _count: { status: 1 } },
+    {
+      status: "pending",
+      _count: { status: 3 },
+      _sum: { amountCents: 0 },
+    },
+    {
+      status: "paid",
+      _count: { status: 4 },
+      _sum: { amountCents: 0 },
+    },
+    {
+      status: "shipped",
+      _count: { status: 1 },
+      _sum: { amountCents: 0 },
+    },
   ]);
 
   render(await Page());
@@ -74,9 +89,13 @@ test("displays the orders status breakdown", async () => {
 });
 
 test("displays sales from paid orders", async () => {
-  mockOrderAggregate.mockResolvedValue({
-    _sum: { amountCents: 20580 },
-  });
+  mockOrderGroupBy.mockResolvedValue([
+    {
+      status: "paid",
+      _count: { status: 1 },
+      _sum: { amountCents: 20580 },
+    },
+  ]);
 
   render(await Page());
 

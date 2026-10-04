@@ -35,9 +35,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           return null;
         }
 
-        const authorizeStart = performance.now();
+   
 
-        const prismaStart = performance.now();
+   
 
         const admin = await prisma.adminAccount.findUnique({
           where: {
@@ -45,31 +45,25 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           },
         });
 
-        console.log(
-          `[perf][auth] Prisma: ${(performance.now() - prismaStart).toFixed(1)} ms`,
-        );
+     
 
         if (!admin) {
           return null;
         }
 
-        const bcryptStart = performance.now();
+
 
         const passwordIsValid = await compare(
           parsed.data.password,
           admin.passwordHash,
         );
 
-        console.log(
-          `[perf][auth] bcrypt: ${(performance.now() - bcryptStart).toFixed(1)} ms`,
-        );
+    
 
         if (!passwordIsValid) {
           return null;
         }
-        console.log(
-          `[perf][auth] authorize total: ${(performance.now() - authorizeStart).toFixed(1)} ms`,
-        );
+    
         return {
           id: String(admin.id),
           email: admin.email,
