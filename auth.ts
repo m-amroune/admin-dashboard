@@ -16,10 +16,10 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   },
 
   callbacks: {
-  authorized({ auth }) {
-    return !!auth?.user;
+    authorized({ auth }) {
+      return !!auth?.user;
+    },
   },
-},
 
   providers: [
     Credentials({
@@ -35,25 +35,35 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           return null;
         }
 
+   
+
+   
+
         const admin = await prisma.adminAccount.findUnique({
           where: {
             email: parsed.data.email,
           },
         });
 
+     
+
         if (!admin) {
           return null;
         }
+
+
 
         const passwordIsValid = await compare(
           parsed.data.password,
           admin.passwordHash,
         );
 
+    
+
         if (!passwordIsValid) {
           return null;
         }
-
+    
         return {
           id: String(admin.id),
           email: admin.email,

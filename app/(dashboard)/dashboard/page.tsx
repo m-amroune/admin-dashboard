@@ -5,38 +5,46 @@ import OrderValueChart from "./OrderValueChart";
 
 // Displays global statistics and provides a logout action
 const page = async () => {
-  // Dashboard statistics
-  const [usersCount, ordersCount, ordersByStatus, paidSales, recentOrders] =
-    await Promise.all([
-      prisma.user.count(),
-      prisma.order.count(),
-      prisma.order.groupBy({
-        by: ["status"],
-        _count: { status: true },
-      }),
-      prisma.order.aggregate({
-        where: { status: "paid" },
-        _sum: { amountCents: true },
-      }),
-      // Latest orders
-      prisma.order.findMany({
-        take: 5,
-        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-        include: {
-          user: {
-            select: {
-              email: true,
-            },
-          },
+ 
+
+
+const [recentOrders, usersCount, orderStats] = await Promise.all([
+  prisma.order.findMany({
+    take: 5,
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    include: {
+      user: {
+        select: {
+          email: true,
         },
-      }),
-    ]);
+      },
+    },
+  }),
+  prisma.user.count(),
+  prisma.order.groupBy({
+    by: ["status"],
+    _count: { status: true },
+    _sum: { amountCents: true },
+  }),
+]);
+
+
+
+  const ordersCount = orderStats.reduce(
+    (total, item) => total + item._count.status,
+    0,
+  );
+
+  const paidSalesCents =
+    orderStats.find((item) => item.status === "paid")?._sum.amountCents ?? 0;
+
+  const ordersByStatus = orderStats;
 
   // Revenue from paid orders
   const sales = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-  }).format((paidSales._sum.amountCents ?? 0) / 100);
+  }).format(paidSalesCents / 100);
 
   // Values of the latest orders for the chart
  const orderValues = [...recentOrders]
