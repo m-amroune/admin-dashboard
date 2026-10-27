@@ -12,7 +12,7 @@ test("displays the sign in button", () => {
   render(<LoginButton />);
 
   expect(
-    screen.getByRole("button", { name: "Sign in" }),
+    screen.getByRole("button", { name: "Access demo" }),
   ).toBeInTheDocument();
 });
 

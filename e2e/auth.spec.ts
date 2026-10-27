@@ -1,8 +1,4 @@
-
-
 import { expect, test } from "./fixtures";
-
-
 
 test("logs in and logs out", async ({ page }) => {
   await page.goto("/login");
@@ -11,7 +7,7 @@ test("logs in and logs out", async ({ page }) => {
     page.getByRole("heading", { name: "Admin Dashboard" }),
   ).toBeVisible();
 
-  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.getByRole("button", { name: "Access demo" }).click();
 
   await expect(page).toHaveURL(/\/dashboard$/);
 
@@ -22,6 +18,22 @@ test("logs in and logs out", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Admin Dashboard" }),
   ).toBeVisible();
+});
+
+test("shows an error for invalid credentials", async ({ page }) => {
+  await page.goto("/login");
+
+  await page.getByLabel("Password").fill("wrong-password");
+
+  await page.getByRole("button", { name: "Access demo" }).click();
+
+  await expect(page).toHaveURL(/\/login\?error=CredentialsSignin$/);
+
+await expect(
+  page.getByRole("alert").filter({ hasText: "Unable to sign in." }),
+).toHaveText(
+  "Unable to sign in. Check the password and try again.",
+);
 });
 
 const protectedRoutes = ["/dashboard", "/orders", "/users"];
@@ -39,7 +51,7 @@ test("allows authenticated users to access protected routes", async ({
 }) => {
   await page.goto("/login");
 
-  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.getByRole("button", { name: "Access demo" }).click();
 
   await expect(page).toHaveURL(/\/dashboard$/);
 

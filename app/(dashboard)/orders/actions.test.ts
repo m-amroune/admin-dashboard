@@ -1,6 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { deleteOrders, updateOrdersStatus } from "./actions";
+import {
+  createOrder,
+  deleteOrder,
+  updateOrderStatus,
+  updateOrdersStatus,
+  deleteOrders,
+} from "./actions";
+import { requireAuth } from "@/lib/require-auth";
 jest.mock("@/lib/prisma", () => ({
   prisma: {
     order: {
@@ -82,4 +89,23 @@ test("deletes selected orders", async () => {
   });
 
   expect(mockRedirect).toHaveBeenCalledWith("/orders");
+});
+
+test.each([
+  { name: "createOrder", action: createOrder },
+  { name: "deleteOrder", action: deleteOrder },
+  { name: "updateOrderStatus", action: updateOrderStatus },
+  { name: "updateOrdersStatus", action: updateOrdersStatus },
+  { name: "deleteOrders", action: deleteOrders },
+])("blocks unauthenticated $name", async ({ action }) => {
+  jest
+    .mocked(requireAuth)
+    .mockRejectedValueOnce(new Error("Unauthenticated"));
+
+  await expect(action(new FormData())).rejects.toThrow("Unauthenticated");
+
+  expect(jest.mocked(requireAuth)).toHaveBeenCalledTimes(1);
+  expect(mockUpdateMany).not.toHaveBeenCalled();
+  expect(mockDeleteMany).not.toHaveBeenCalled();
+  expect(mockRedirect).not.toHaveBeenCalled();
 });
