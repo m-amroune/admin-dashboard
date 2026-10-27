@@ -6,7 +6,7 @@ import { expect, test } from "./fixtures";
 async function login(page: Page) {
   await page.goto("/login");
 
-  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.getByRole("button", { name: "Access demo"}).click();
 
   await expect(page).toHaveURL(/\/dashboard$/);
 }

@@ -1,18 +1,33 @@
 import { signIn } from "@/auth";
 import { LoginButton } from "./LoginButton";
 import { LayoutDashboard, ShoppingBag, UserRound, Users } from "lucide-react";
+import { AuthError } from "next-auth";
+import { redirect } from "next/navigation";
 
 async function login(formData: FormData) {
   "use server";
 
-  await signIn("credentials", {
-    email: formData.get("email"),
-    password: formData.get("password"),
-    redirectTo: "/dashboard",
-  });
+  try {
+    await signIn("credentials", {
+      email: formData.get("email"),
+      password: formData.get("password"),
+      redirectTo: "/dashboard",
+    });
+  } catch (error) {
+    if (error instanceof AuthError && error.type === "CredentialsSignin") {
+      redirect("/login?error=CredentialsSignin");
+    }
+
+    throw error;
+  }
 }
 
-export default function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-200 px-4 py-8">
       {/* Background light effects */}
@@ -29,7 +44,7 @@ export default function Page() {
               </h1>
 
               <p className="mt-3 text-base text-slate-500">
-                Sign in to continue
+                Access the demo admin account
               </p>
             </div>
 
@@ -68,7 +83,14 @@ export default function Page() {
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
                 />
               </div>
-
+              {error === "CredentialsSignin" && (
+                <p
+                  role="alert"
+                  className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                >
+                  Unable to sign in. Check the password and try again.
+                </p>
+              )}
               <LoginButton />
             </form>
 
