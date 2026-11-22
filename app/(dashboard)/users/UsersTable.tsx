@@ -11,8 +11,10 @@ import {
   filterFn_equalsString,
   type ColumnDef,
 } from "@tanstack/react-table";
-import { deleteUser, toggleRole } from "./actions";
+import UserRoleSelect from "./UserRoleSelect";
+import DeleteUserButton from "./DeleteUserButton";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import UserIdentity from "./UserIdentity";
 
 export type UserRow = {
   id: number;
@@ -26,7 +28,7 @@ const features = tableFeatures({
   rowSortingFeature,
   filteredRowModel: createFilteredRowModel(),
   sortedRowModel: createSortedRowModel(),
-  
+
   filterFns: {
     includesString: filterFn_includesString,
     equalsString: filterFn_equalsString,
@@ -113,20 +115,16 @@ export default function UsersTable({
     router.replace(`${pathname}?${params.toString()}`);
   };
   const table = useTable(
-  {
-    features,
-    columns,
-    data,
-  },
-  (state) => state,
-);
-
-  if (data.length === 0) {
-    return <p className="mb-4 text-sm text-gray-500">No users found.</p>;
-  }
+    {
+      features,
+      columns,
+      data,
+    },
+    (state) => state,
+  );
 
   return (
-    <div className="max-w-4xl">
+    <div className="w-full">
       {/* Users toolbar */}
       <div className="mb-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm lg:flex-row lg:items-center lg:justify-between">
         {/* Search and filter */}
@@ -189,61 +187,52 @@ export default function UsersTable({
       </div>
 
       {/* Users table */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
         {/* Table header */}
-        <div className="hidden border-b border-slate-200 bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-600 md:grid md:grid-cols-[1fr_120px_260px] md:items-center md:gap-4">
-          <span>Email</span>
-          <span>Role</span>
-          <span>Actions</span>
+        <div className="hidden border-b border-slate-200 bg-slate-100 px-5 py-3 text-base font-semibold text-slate-600 lg:grid lg:grid-cols-[1fr_120px_260px] lg:items-center lg:gap-4">
+          <span className="text-center">User</span>
+          <span className="text-center">Role</span>
+          <span className="text-center">Actions</span>
         </div>
 
         {/* Table rows */}
+        {data.length === 0 && (
+          <div className="px-5 py-12 text-center">
+            <p className="text-base font-medium text-slate-700">
+              No users found.
+            </p>
+            <p className="mt-1 text-sm text-slate-500">
+              Try another search or role filter.
+            </p>
+          </div>
+        )}
+
         {table.getRowModel().rows.map((row) => {
           const user = row.original;
 
           return (
             <div
               key={user.id}
-              className="grid gap-4 border-b border-slate-200 px-5 py-4 text-sm last:border-b-0 lg:grid-cols-[1fr_120px_260px] lg:items-center"
+              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3 border-b border-slate-200 px-4 py-4 last:border-b-0 lg:grid-cols-[1fr_120px_260px] lg:gap-4 lg:px-5"
             >
               {/* Email */}
-              <span className="font-medium text-slate-800">{user.email}</span>
+              <div className="col-span-2 min-w-0 lg:col-span-1">
+  <UserIdentity name={user.name} email={user.email} />
+</div>
 
               {/* Role */}
-              <span
-                className={`w-fit rounded-full border px-3 py-1 text-sm font-medium ${
-                  user.role === "admin"
-                    ? "border-blue-200 bg-blue-50 text-blue-700"
-                    : "border-slate-200 bg-slate-50 text-slate-600"
-                }`}
-              >
-                {user.role}
-              </span>
+              <UserRoleSelect
+                userId={user.id}
+                role={user.role}
+                userLabel={user.name?.trim() || user.email}
+              />
 
               {/* Actions */}
-              <div className="flex items-center gap-3">
-                <form action={toggleRole}>
-                  <input type="hidden" name="id" value={user.id} />
-                  <input type="hidden" name="role" value={user.role} />
-
-                  <button
-                    type="submit"
-                    className="w-36 cursor-pointer rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-                  >
-                    {user.role === "admin" ? "Remove admin" : "Make admin"}
-                  </button>
-                </form>
-
-                <form action={deleteUser}>
-                  <input type="hidden" name="id" value={user.id} />
-
-                  <button
-                    type="submit"
-                    className="cursor-pointer rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
-                  >
-                    Delete
-                  </button>
-                </form>
+              <div className="flex items-center justify-self-end gap-3 lg:justify-self-center">
+                <DeleteUserButton
+                  userId={user.id}
+                  userLabel={user.name?.trim() || user.email}
+                />
               </div>
             </div>
           );

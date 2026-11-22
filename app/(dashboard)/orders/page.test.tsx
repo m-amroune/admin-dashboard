@@ -135,7 +135,7 @@ test("displays the empty state when there are no orders", async () => {
   expect(screen.getByText("No orders found.")).toBeInTheDocument();
 });
 
-test("filters orders by email", async () => {
+test("filters orders by customer name or email", async () => {
   mockFindMany.mockResolvedValue([]);
 
   await renderPage({ search: "jane" });
@@ -144,10 +144,20 @@ test("filters orders by email", async () => {
     expect.objectContaining({
       where: expect.objectContaining({
         user: {
-          email: {
-            contains: "jane",
-            mode: "insensitive",
-          },
+          OR: [
+            {
+              name: {
+                contains: "jane",
+                mode: "insensitive",
+              },
+            },
+            {
+              email: {
+                contains: "jane",
+                mode: "insensitive",
+              },
+            },
+          ],
         },
       }),
     }),
@@ -168,11 +178,11 @@ test("filters orders by status", async () => {
   );
 });
 
-test("sorts orders by email", async () => {
+test("sorts orders by customer name", async () => {
   mockFindMany.mockResolvedValue([]);
 
   await renderPage({
-    sort: "email",
+    sort: "name",
     order: "desc",
   });
 
@@ -180,7 +190,7 @@ test("sorts orders by email", async () => {
     expect.objectContaining({
       orderBy: {
         user: {
-          email: "desc",
+          name: "desc",
         },
       },
     }),
@@ -214,7 +224,9 @@ test("displays order reference and amount", async () => {
 
   await renderPage();
 
-  expect(screen.getByText("ORD-TEST-001")).toBeInTheDocument();
+ expect(
+  screen.getByText("ORD-TEST-001", { selector: "div" }),
+).toBeInTheDocument();
   expect(screen.getByText("$49.90")).toBeInTheDocument();
 });
 

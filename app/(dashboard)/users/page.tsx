@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import UsersTable from "./UsersTable";
 import { requireAuth } from "@/lib/require-auth";
 export const dynamic = "force-dynamic";
+import AddUserDialog from "./AddUserDialog";
 
 // Server action called on form submit.
 // Creates a new user, then redirects.
@@ -13,11 +14,12 @@ async function createUser(formData: FormData) {
   const name = String(formData.get("name") || "").trim();
 
   if (!email) redirect("/users?error=missing_email");
+  if (!name) redirect("/users?error=missing_name");
 
   await prisma.user.create({
     data: {
       email,
-      name: name || null,
+      name,
     },
   });
   redirect("/users?created=1");
@@ -111,40 +113,26 @@ export default async function Page({
 }
 
   return (
-    <div className="max-w-3xl">
-      <h1 className="mb-6 text-2xl font-semibold">Users</h1>
-      {/* Create user */}
-      <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="mb-4 text-base font-semibold text-slate-900">
-          Add user
-        </h2>
+    <div className="max-w-4xl lg:ml-8">
+  <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <div className="flex items-center gap-3">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-950">
+          Users
+        </h1>
 
-        <form
-          action={createUser}
-          className="flex flex-col gap-3 sm:flex-row sm:items-center"
-        >
-          <input
-            type="text"
-            name="name"
-            placeholder="Name (optional)"
-            className="h-12 min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-4 text-base text-slate-700 outline-none transition focus:border-blue-500"
-          />
-
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            className="h-12 min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-4 text-base text-slate-700 outline-none transition focus:border-blue-500"
-          />
-
-          <button
-            type="submit"
-            className="h-12 shrink-0 whitespace-nowrap rounded-lg bg-blue-600 px-6 text-base font-semibold text-white transition hover:bg-blue-500"
-          >
-            Add user
-          </button>
-        </form>
+        <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+          {totalUsers}
+        </span>
       </div>
+
+      <p className="mt-1 text-sm text-slate-500">
+        Manage user profiles and access roles.
+      </p>
+    </div>
+
+    <AddUserDialog action={createUser} />
+  </div>
       {hasOrdersError && (
         <p className="mb-4 text-base text-red-600">
           This user cannot be deleted because they have existing orders.
