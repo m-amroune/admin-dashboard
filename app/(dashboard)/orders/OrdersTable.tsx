@@ -17,12 +17,9 @@ import {
   type ColumnDef,
 } from "@tanstack/react-table";
 
-import {
-  deleteOrder,
-  deleteOrders,
-  updateOrderStatus,
-  updateOrdersStatus,
-} from "./actions";
+import OrderBulkActions from "./OrderBulkActions";
+import OrderStatusSelect from "./OrderStatusSelect";
+import OrderRowActions from "./OrderRowActions";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -31,6 +28,7 @@ export type OrderRow = {
   reference: string;
   amountCents: number | null;
   email: string;
+  name: string | null;
   status: string;
 };
 
@@ -70,7 +68,7 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
   },
   {
     accessorKey: "email",
-    header: "Email",
+    header: "Customer",
     sortFn: "text",
     filterFn: "includesString",
     cell: (info) => {
@@ -79,9 +77,9 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
       return (
         <Link
           href={`/orders/${order.id}`}
-          className="text-sm font-medium text-gray-800 hover:underline"
+          className="text-base font-medium text-slate-800 transition hover:text-blue-700 hover:underline"
         >
-          {order.email}
+          {order.name?.trim() || order.email}
         </Link>
       );
     },
@@ -104,55 +102,10 @@ const columns: Array<ColumnDef<typeof features, OrderRow>> = [
       const order = info.row.original;
 
       return (
-        <div className="flex items-center gap-2">
-          <form action={updateOrderStatus} className="flex items-center gap-2">
-            <input type="hidden" name="id" value={order.id} />
+        <div className="flex flex-wrap items-center gap-2">
+          <OrderStatusSelect orderId={order.id} status={order.status} />
 
-            <select
-              name="status"
-              defaultValue={order.status}
-              required
-              aria-label="Order status"
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
-            >
-              <option value="pending">Pending</option>
-              <option value="paid">Paid</option>
-              <option value="shipped">Shipped</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-
-            <button
-              type="submit"
-              className="cursor-pointer rounded-lg border border-slate-700 bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-600"
-            >
-              Update
-            </button>
-          </form>
-
-          <Link
-            href={`/orders/${order.id}`}
-            className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-          >
-            View details
-          </Link>
-
-          <form
-            action={deleteOrder}
-            onSubmit={(event) => {
-              if (!window.confirm("Delete this order?")) {
-                event.preventDefault();
-              }
-            }}
-          >
-            <input type="hidden" name="id" value={order.id} />
-
-            <button
-              type="submit"
-              className="cursor-pointer rounded-lg border border-red-200 px-4 py-2 text-base font-medium text-red-600 transition hover:bg-red-50"
-            >
-              Delete
-            </button>
-          </form>
+          <OrderRowActions orderId={order.id} reference={order.reference} />
         </div>
       );
     },
@@ -188,10 +141,10 @@ export default function OrdersTable({
     router.replace(`${pathname}?${params.toString()}`);
   };
 
-  const currentSort = searchParams.get("sort") ?? "email";
+  const currentSort = searchParams.get("sort") ?? "name";
   const currentOrder = searchParams.get("order") === "desc" ? "desc" : "asc";
 
-  const updateSort = (sort: "email" | "status") => {
+  const updateSort = (sort: "name" | "status") => {
     const params = new URLSearchParams(searchParams.toString());
 
     const nextOrder =
@@ -244,8 +197,8 @@ export default function OrdersTable({
             type="search"
             value={searchParams.get("search") ?? ""}
             onChange={(event) => updateQuery("search", event.target.value)}
-            placeholder="Search by email..."
-            aria-label="Search orders by email"
+            placeholder="Search customers..."
+            aria-label="Search customers"
             className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-base text-slate-700 outline-none transition focus:border-blue-500 sm:w-64"
           />
 
@@ -264,29 +217,29 @@ export default function OrdersTable({
         </div>
 
         {/* Sorting */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="shrink-0 whitespace-nowrap text-base text-slate-500">
             Sort by :
           </span>
 
           <button
             type="button"
-            onClick={() => updateSort("email")}
-            className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition ${
-              currentSort === "email"
+            onClick={() => updateSort("name")}
+            className={`cursor-pointer rounded-lg px-4 py-2 text-base font-medium transition ${
+              currentSort === "name"
                 ? "bg-blue-600 text-white shadow-sm hover:bg-blue-500"
                 : "border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200"
             }`}
           >
-            Email
-            {currentSort === "email" && currentOrder === "asc" && " ↑"}
-            {currentSort === "email" && currentOrder === "desc" && " ↓"}
+            Customer
+            {currentSort === "name" && currentOrder === "asc" && " ↑"}
+            {currentSort === "name" && currentOrder === "desc" && " ↓"}
           </button>
 
           <button
             type="button"
             onClick={() => updateSort("status")}
-            className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition ${
+            className={`cursor-pointer rounded-lg px-4 py-2 text-base font-medium transition ${
               currentSort === "status"
                 ? "bg-blue-600 text-white shadow-sm hover:bg-blue-500"
                 : "border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -302,67 +255,10 @@ export default function OrdersTable({
       <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-sm">
         {/* Selected orders */}
         {selectedCount > 0 && (
-          <div className="mb-4 flex flex-col gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-sm font-semibold text-blue-700">
-              {selectedCount} {selectedCount === 1 ? "order" : "orders"}{" "}
-              selected
-            </span>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <form action={updateOrdersStatus}>
-                {selectedOrderIds.map((id) => (
-                  <input key={id} type="hidden" name="ids" value={id} />
-                ))}
-
-                <input type="hidden" name="status" value="paid" />
-
-                <button
-                  type="submit"
-                  className="cursor-pointer rounded-lg border border-blue-200 bg-white px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-100"
-                >
-                  Mark as paid
-                </button>
-              </form>
-
-              <form action={updateOrdersStatus}>
-                {selectedOrderIds.map((id) => (
-                  <input key={id} type="hidden" name="ids" value={id} />
-                ))}
-
-                <input type="hidden" name="status" value="shipped" />
-
-                <button
-                  type="submit"
-                  className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500"
-                >
-                  Mark as shipped
-                </button>
-              </form>
-
-              <form
-                action={deleteOrders}
-                onSubmit={(event) => {
-                  if (!window.confirm("Delete selected orders?")) {
-                    event.preventDefault();
-                  }
-                }}
-              >
-                {selectedOrderIds.map((id) => (
-                  <input key={id} type="hidden" name="ids" value={id} />
-                ))}
-
-                <button
-                  type="submit"
-                  className="cursor-pointer rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
-                >
-                  Delete selected
-                </button>
-              </form>
-            </div>
-          </div>
+          <OrderBulkActions selectedOrderIds={selectedOrderIds} />
         )}
         {/* Table header */}
-        <div className="hidden border-b border-slate-200 bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-600 lg:grid lg:grid-cols-[32px_120px_100px_180px_minmax(0,1fr)] lg:items-center lg:gap-4">
+        <div className="hidden border-b border-slate-200 bg-slate-100 px-5 py-3 text-[15px] font-semibold text-slate-600 xl:grid xl:grid-cols-[32px_130px_110px_minmax(170px,1fr)_minmax(310px,1.4fr)] xl:items-center xl:gap-4">
           <input
             type="checkbox"
             checked={table.getIsAllPageRowsSelected()}
@@ -379,7 +275,7 @@ export default function OrdersTable({
         {table.getRowModel().rows.map((row) => (
           <div
             key={row.id}
-            className="grid gap-4 border-b border-slate-200 px-5 py-4 text-base last:border-b-0 lg:grid-cols-[32px_120px_100px_180px_minmax(0,1fr)] lg:items-center"
+            className="grid grid-cols-[24px_minmax(0,1fr)] gap-x-3 gap-y-4 border-b border-slate-200 px-5 py-4 text-base last:border-b-0 md:grid-cols-[24px_130px_105px_minmax(0,1fr)] md:gap-x-4 xl:grid-cols-[32px_130px_110px_minmax(170px,1fr)_minmax(310px,1.4fr)] xl:items-center xl:gap-4"
           >
             {/* Row selection */}
             <input
@@ -394,7 +290,16 @@ export default function OrdersTable({
               .getAllCells()
               .filter((cell) => cell.column.id !== "status")
               .map((cell) => (
-                <div key={cell.id}>
+                <div
+                  key={cell.id}
+                  className={
+                    cell.column.id === "reference"
+                      ? "min-w-0"
+                      : cell.column.id === "actions"
+                        ? "col-span-2 min-w-0 md:col-span-3 md:col-start-2 xl:col-span-1 xl:col-start-auto"
+                        : "col-span-2 min-w-0 md:col-span-1"
+                  }
+                >
                   <table.FlexRender cell={cell} />
                 </div>
               ))}

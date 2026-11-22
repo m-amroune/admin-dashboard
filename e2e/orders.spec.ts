@@ -2,7 +2,6 @@ import type { Page } from "@playwright/test";
 
 import { expect, test } from "./fixtures";
 
-
 async function login(page: Page) {
   await page.goto("/login");
 
@@ -11,14 +10,16 @@ async function login(page: Page) {
   await expect(page).toHaveURL(/\/dashboard$/);
 }
 
-
-
 test("creates an order", async ({ page }) => {
   await login(page);
 
   await page.goto("/orders");
 
-  const userSelect = page.getByLabel("User");
+  await page
+  .getByRole("button", { name: "Add order", exact: true })
+  .click();
+
+  const userSelect = page.locator('select[name="userId"]');
 
   const aliceOption = userSelect
     .locator("option")
@@ -33,8 +34,8 @@ test("creates an order", async ({ page }) => {
   await page.getByLabel("Amount").fill("25.50");
 
   await page
-    .getByRole("button", { name: "Add order", exact: true })
-    .click();
+  .getByRole("button", { name: "Create order", exact: true })
+  .click();
 
   await expect(page).toHaveURL(/\/orders$/);
 
@@ -58,16 +59,16 @@ test("updates an order status", async ({ page }) => {
 
   await expect(statusSelect).toHaveValue("pending");
 
-  await statusSelect.selectOption("paid");
+  await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.request().method() === "POST" &&
+        new URL(response.url()).pathname === "/orders",
+    ),
+    statusSelect.selectOption("paid"),
+  ]);
 
-  await orderRow
-    .getByRole("button", {
-      name: "Update",
-      exact: true,
-    })
-    .click();
-
-  await expect(page).toHaveURL(/\/orders$/);
+  await page.reload();
 
   await expect(
     page
@@ -94,14 +95,21 @@ test("deletes an order", async ({ page }) => {
 
   const orderRow = orderCheckbox.locator("..");
 
-  page.once("dialog", async (dialog) => {
-    expect(dialog.message()).toBe("Delete this order?");
-    await dialog.accept();
-  });
-
   await orderRow
     .getByRole("button", {
-      name: "Delete",
+      name: "Delete order ORD-E2E-001",
+    })
+    .click();
+
+  const confirmation = page.getByRole("dialog", {
+    name: "Delete order?",
+  });
+
+  await expect(confirmation).toBeVisible();
+
+  await confirmation
+    .getByRole("button", {
+      name: "Delete order",
       exact: true,
     })
     .click();
@@ -185,14 +193,22 @@ test("deletes selected orders", async ({ page }) => {
 
   await expect(page.getByText("2 orders selected")).toBeVisible();
 
-  page.once("dialog", async (dialog) => {
-    expect(dialog.message()).toBe("Delete selected orders?");
-    await dialog.accept();
-  });
-
   await page
     .getByRole("button", {
       name: "Delete selected",
+      exact: true,
+    })
+    .click();
+
+  const confirmation = page.getByRole("dialog", {
+    name: "Delete selected orders?",
+  });
+
+  await expect(confirmation).toBeVisible();
+
+  await confirmation
+    .getByRole("button", {
+      name: "Delete orders",
       exact: true,
     })
     .click();

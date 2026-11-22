@@ -17,7 +17,7 @@ test("filters orders with URL parameters", async ({ page }) => {
   await page.goto("/orders");
 
   await page
-    .getByRole("searchbox", { name: "Search orders by email" })
+    .getByRole("searchbox", { name: "Search customers" })
     .fill("alice");
 
   await expect(page).toHaveURL(/search=alice/);

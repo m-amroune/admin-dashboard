@@ -51,6 +51,7 @@ const renderPage = async (searchParams: TestSearchParams = {}) => {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockFindMany.mockResolvedValue([]);
   mockCount.mockResolvedValue(2);
 });
 
@@ -58,25 +59,36 @@ test("displays users from the database", async () => {
   mockFindMany.mockResolvedValue([
     {
       id: 1,
-      name: null,
-      email: "admin@example.com",
+      name: "Mayra Ziemann",
+      email: "mayra.ziemann@example.com",
       role: "admin",
     },
     {
       id: 2,
-      name: null,
-      email: "user@example.com",
+      name: "Skyla Friesen",
+      email: "skyla.friesen@example.com",
       role: "user",
     },
   ]);
 
   await renderPage();
 
-  expect(screen.getByText("admin@example.com")).toBeInTheDocument();
-  expect(screen.getByText("user@example.com")).toBeInTheDocument();
+  expect(
+  screen.getByText("Mayra Ziemann", { selector: "p" }),
+).toBeInTheDocument();
+  expect(
+    screen.getByText("mayra.ziemann@example.com"),
+  ).toBeInTheDocument();
+
+  expect(
+  screen.getByText("Skyla Friesen", { selector: "p" }),
+).toBeInTheDocument();
+  expect(
+    screen.getByText("skyla.friesen@example.com"),
+  ).toBeInTheDocument();
 });
 
-test("displays Make admin for a regular user", async () => {
+test("displays the role selector for a regular user", async () => {
   mockFindMany.mockResolvedValue([
     {
       id: 1,
@@ -88,12 +100,15 @@ test("displays Make admin for a regular user", async () => {
 
   await renderPage();
 
-  expect(
-    screen.getByRole("button", { name: "Make admin" }),
-  ).toBeInTheDocument();
+  const roleSelect = screen.getByRole("combobox", {
+    name: "Change role for user@example.com",
+  });
+
+  expect(roleSelect).toHaveValue("user");
+  expect(roleSelect).toHaveDisplayValue("User");
 });
 
-test("displays Remove admin for an admin user", async () => {
+test("displays the role selector for an admin user", async () => {
   mockFindMany.mockResolvedValue([
     {
       id: 1,
@@ -105,9 +120,12 @@ test("displays Remove admin for an admin user", async () => {
 
   await renderPage();
 
-  expect(
-    screen.getByRole("button", { name: "Remove admin" }),
-  ).toBeInTheDocument();
+  const roleSelect = screen.getByRole("combobox", {
+    name: "Change role for admin@example.com",
+  });
+
+  expect(roleSelect).toHaveValue("admin");
+  expect(roleSelect).toHaveDisplayValue("Admin");
 });
 
 test("displays the empty state when there are no users", async () => {
