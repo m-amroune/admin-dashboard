@@ -111,6 +111,7 @@ test("displays recent orders", async () => {
       amountCents: 3490,
       status: "shipped",
       user: {
+        name: "Jack Doe",
         email: "jack.doe@example.com",
       },
     },
@@ -120,6 +121,6 @@ test("displays recent orders", async () => {
 
   expect(screen.getByText("Recent orders")).toBeInTheDocument();
   expect(screen.getByText("ORD-SEED-005")).toBeInTheDocument();
-  expect(screen.getByText("jack.doe@example.com")).toBeInTheDocument();
+  expect(screen.getByText("Jack Doe")).toBeInTheDocument();
   expect(screen.getByText("$34.90")).toBeInTheDocument();
 });

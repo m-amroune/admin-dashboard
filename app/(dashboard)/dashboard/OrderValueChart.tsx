@@ -25,12 +25,7 @@ export default function OrderValueChart({
       <BarChart data={data}>
         <CartesianGrid vertical={false} strokeDasharray="3 3" />
 
-        <XAxis
-          dataKey="reference"
-          tickLine={false}
-          axisLine={false}
-          fontSize={11}
-        />
+       <XAxis dataKey="reference" hide />
 
         <YAxis
           tickLine={false}

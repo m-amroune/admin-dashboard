@@ -16,8 +16,8 @@ Admin dashboard built with Next.js, TypeScript, Prisma and PostgreSQL for managi
 
 - **Dashboard:** User and order statistics, sales metrics, order status distribution and recent orders.
 - **Authentication:** Auth.js credentials authentication, bcrypt password hashing, protected routes and Server Actions, and logout.
-- **Users:** Creation, deletion, role management, search, filtering, sorting and server-side pagination.
-- **Orders:** Creation, deletion, detail pages, status updates, search, filtering, sorting, pagination, bulk actions and status history.
+- **Users:** Create users with required names, manage roles directly from the table, search by name or email, filter, sort, paginate and confirm deletions.
+- **Orders:** Create orders through a dialog, display customer names, search by name or email, update statuses directly, filter, sort, paginate, manage bulk actions and view order details with status history.
 - **Health Check:** API endpoint for checking the PostgreSQL database connection.
 
 ### Order Workflow
